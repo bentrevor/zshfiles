@@ -2,6 +2,15 @@ ZSH=$HOME/.oh-my-zsh
 
 ZSH_THEME="norm"
 COMPLETION_WAITING_DOTS="true"
+
+platform='unknown'
+unamestr=$(uname)
+if [[ "$unamestr" == 'Linux' ]]; then
+   platform='linux'
+elif [[ "$unamestr" == 'Darwin' ]]; then
+   platform='osx'
+fi
+
 # Path
 export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:$PATH
 
@@ -12,8 +21,6 @@ plugins=(git
          battery
          cp
          git-extras)
-
-source $ZSH/oh-my-zsh.sh
 
 # Completion
 setopt COMPLETE_IN_WORD
@@ -58,22 +65,29 @@ set -o emacs
 # Load other config files
 for config_file ($HOME/.zsh/*.zsh(.N)) source $config_file
 
+# differences between osx and linux
+if [[ $platform == 'linux' ]]; then
+  promptcolor1='green'
+  promptcolor2='blue'
+  alias ls='ls --color'
+elif [[ $platform == 'osx' ]]; then
+  promptcolor1='yellow'
+  promptcolor2='red'
+  alias ls='ls -G'
+fi
+
 # prompt
 export PATH=$HOME/.bin:$PATH
 
 git_prompt_info() {
-  ref=$($(which git) symbolic-ref HEAD 2> /dev/null) || return
-  user=$($(which git) config user.name 2> /dev/null)
-  echo "[%{$fg_bold[green]%}${user}@${ref#refs/heads/}%{$reset_color%}]"
+  ref=$($(which hub) symbolic-ref HEAD 2> /dev/null) || return
+  user=$($(which hub) config user.name 2> /dev/null)
+  echo "[%{$fg_bold[$promptcolor1]%}${user}@${ref#refs/heads/}%{$reset_color%}]"
 }
 
-export PS1='$(git_prompt_info)[%{$fg_bold[blue]%}%~%{$reset_color%}] '
+export PS1='$(git_prompt_info)[%{$fg_bold[$promptcolor2]%}%~%{$reset_color%}] '
 
 # aliases
-alias be='bundle exec'
-
-# some ls aliases
-alias ls='ls -G' # -G adds color
 alias l='ls -lhpG'
 alias lsa='ls -lhpA'
 
@@ -91,22 +105,14 @@ alias sudo='sudo '
 # better `echo $PATH` output
 alias showpath="echo $PATH | tr : '\n'"
 
-# use case-insensitive search by default for locate
-alias loc='locate -i'
-
 # let tmux use 256 colors
 alias tmux='tmux -2'
-
-alias cucu='cucumber'
 
 # git aliases
 alias gitlog='git log --graph --pretty=format:"   %s"'
 alias gd='git diff'
 alias gs='git status'
 alias gb='git branch'
-
-# rails aliases
-alias rc='rails c --sandbox'
 
 # load boxen environment
 source /opt/boxen/env.sh
