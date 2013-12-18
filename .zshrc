@@ -49,6 +49,7 @@ setopt HIST_REDUCE_BLANKS
 unsetopt correct_all
 bindkey -e
 bindkey '^r' history-incremental-search-backward
+bindkey '^[[Z' reverse-menu-complete
 
 autoload -U select-word-style
 select-word-style bash
