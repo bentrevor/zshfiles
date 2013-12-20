@@ -29,5 +29,5 @@ def link_zshrc
 end
 
 link_zshrc
-install_syntax_highlighting
+install_syntax_highlighting git_bundles
 
