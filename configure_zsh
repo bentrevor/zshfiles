@@ -9,7 +9,8 @@ git_bundles = [
 
 FileUtils.cd File.dirname(__FILE__)
 
-def install_syntax_highlighting
+def install_syntax_highlighting(bundles)
+  git_bundles = bundles
   git_bundles.each do |url|
     dir = url.split('/').last.sub(/\.git$/, '')
 
