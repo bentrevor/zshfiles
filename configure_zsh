@@ -25,7 +25,7 @@ def install_syntax_highlighting(bundles)
 end
 
 def link_zshrc
-  FileUtils.ln_s('.zshrc', '~/.zshrc')
+  `ln -s ~/.zsh/.zshrc ~/.zshrc`
 end
 
 link_zshrc
