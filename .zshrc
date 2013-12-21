@@ -23,6 +23,9 @@ plugins=(git
          git-extras)
 
 # Completion
+# add custom completion to fpath
+fpath=(~/.zsh/completion $fpath)
+
 setopt COMPLETE_IN_WORD
 autoload -U compinit
 compinit

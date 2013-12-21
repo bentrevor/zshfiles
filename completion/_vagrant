@@ -1,0 +1,5 @@
+#compdef vagrant
+
+_arguments "1: :(up halt destroy ssh init box)" \
+           "*:Options:(list --provision --help)"
+
