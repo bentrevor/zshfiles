@@ -50,9 +50,11 @@ setopt HIST_IGNORE_ALL_DUPS  # don't record dupes in history
 setopt HIST_IGNORE_DUPS
 setopt HIST_REDUCE_BLANKS
 unsetopt correct_all
-bindkey -e
-bindkey '^r' history-incremental-search-backward
+bindkey -e # use emacs key bindings
+bindkey '^r' history-incremental-search-backward # make Control-r work
 bindkey '^[[Z' reverse-menu-complete
+bindkey "^[[3~" delete-char # make delete key work
+bindkey "^[3;5~" delete-char
 
 autoload -U select-word-style
 select-word-style bash
