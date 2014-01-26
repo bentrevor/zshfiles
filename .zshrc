@@ -86,16 +86,20 @@ fi
 export PATH=$HOME/.bin:$PATH
 
 git_prompt_info() {
-  ref=$($(which hub) symbolic-ref HEAD 2> /dev/null) || return
-  user=$($(which hub) config user.name 2> /dev/null)
+  ref=$($(which git) symbolic-ref HEAD 2> /dev/null) || return
+  user=$($(which git) config user.name 2> /dev/null)
   echo "[%{$fg_bold[$promptcolor1]%}${user}@${ref#refs/heads/}%{$reset_color%}]"
 }
 
 export PS1='$(git_prompt_info)[%{$fg_bold[$promptcolor2]%}%~%{$reset_color%}] '
 
 # aliases
+# ls
 alias l='ls -lhpG'
 alias lsa='ls -lhpA'
+
+alias c='command'
+alias e='emacs'
 
 # use color with grep
 alias grep='grep --color=auto'
@@ -114,18 +118,34 @@ alias showpath="echo $PATH | tr : '\n'"
 # let tmux use 256 colors
 alias tmux='tmux -2'
 
+# rails
+alias be='bundle exec'
+alias s='spring'
+
 # git aliases
-alias gitlog='git log --graph --pretty=format:"   %s"'
+alias gl='git log --graph --pretty=format:"   %s"'
 alias gd='git diff'
 alias gs='git status'
 alias gb='git branch'
 
-# load boxen environment
-source /opt/boxen/env.sh
+# start/stop postgres
+alias pgstart="pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server.log start"
+alias pgstop="pg_ctl -D /usr/local/bin/postgres stop -s -m fast"
 
-# add rbenv command
-export PATH="$HOME/.rbenv/bin:$PATH"
+alias scm='scheme-r5rs'
 
-# add rbenv init to shell
-eval "$(rbenv init -)"
+if [[ -a /Users/ben/.rvm/scripts/rvm ]]; then
+  source /Users/ben/.rvm/scripts/rvm
+fi
 
+if [[ -a ~/.vpn_functions ]]; then
+  source ~/.vpn_functions
+fi
+
+source ~/.zsh/export_homebrew_github_api_token.sh
+
+export CC=/usr/local/Cellar/apple-gcc42/4.2.1-5666.3/bin/gcc-4.2
+export CXX=/usr/local/Cellar/apple-gcc42/4.2.1-5666.3/bin/g++-4.2
+export CPP=/usr/local/Cellar/apple-gcc42/4.2.1-5666.3/bin/cpp-4.2
+
+PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
