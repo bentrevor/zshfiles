@@ -142,6 +142,8 @@ if [[ -a ~/.vpn_functions ]]; then
   source ~/.vpn_functions
 fi
 
+source $(brew --prefix)/etc/profile.d/z.sh
+
 source ~/.zsh/export_homebrew_github_api_token.sh
 
 export CC=/usr/local/Cellar/apple-gcc42/4.2.1-5666.3/bin/gcc-4.2
