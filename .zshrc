@@ -123,7 +123,7 @@ alias be='bundle exec'
 alias s='spring'
 
 # git aliases
-alias gl='git log --graph --pretty=format:"   %s"'
+alias gl="git log --graph --date=short --format=format:'%C(blue)%h%C(white) %C(240)- %C(white)%s%C(240) -- %an, %ad'"
 alias gd='git diff'
 alias gs='git status'
 alias gb='git branch'
