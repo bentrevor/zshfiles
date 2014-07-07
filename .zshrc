@@ -85,13 +85,27 @@ fi
 # prompt
 export PATH=$HOME/.bin:$PATH
 
-git_prompt_info() {
-  ref=$($(which git) symbolic-ref HEAD 2> /dev/null) || return
-  user=$($(which git) config user.name 2> /dev/null)
-  echo "[%{$fg_bold[$promptcolor1]%}${user}@${ref#refs/heads/}%{$reset_color%}]"
+function vm_prompt_info() {
+  if [[ $platform == 'linux' ]]; then
+    cat /vagrant/Vagrantfile | grep config.vm.define | awk -F' ' '{print $2}' | awk -F: '{print $2}'
+  fi
 }
 
-export PS1='$(git_prompt_info)[%{$fg_bold[$promptcolor2]%}%~%{$reset_color%}] '
+function git_prompt_info() {
+  ref=$($(which git) symbolic-ref HEAD 2> /dev/null) || return
+  user=$($(which git) config user.name 2> /dev/null)
+  echo "${ref#refs/heads/}"
+}
+
+function current_info() {
+  echo "%{$fg_bold[$promptcolor1]%}$(vm_prompt_info) @ $(git_prompt_info)%{$reset_color%}"
+}
+
+function current_dir() {
+  echo "%{$fg_bold[$promptcolor2]%}%~%{$reset_color%}"
+}
+
+export PS1='[$(current_info)][$(current_dir)] '
 
 # aliases
 # ls
