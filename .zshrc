@@ -132,7 +132,9 @@ alias gb='git branch'
 alias pgstart="pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server.log start"
 alias pgstop="pg_ctl -D /usr/local/bin/postgres stop -s -m fast"
 
+# other
 alias scm='scheme-r5rs'
+alias wget_mirror='wget --mirror -p --html-extension --convert-links'
 
 if [[ -a /Users/ben/.rvm/scripts/rvm ]]; then
   source /Users/ben/.rvm/scripts/rvm
@@ -142,12 +144,14 @@ if [[ -a ~/.vpn_functions ]]; then
   source ~/.vpn_functions
 fi
 
-source $(brew --prefix)/etc/profile.d/z.sh
+if [[ $platform == 'osx' ]]; then
+  source $(brew --prefix)/etc/profile.d/z.sh
 
-source ~/.zsh/export_homebrew_github_api_token.sh
+  source ~/.zsh/export_homebrew_github_api_token.sh
 
-export CC=/usr/local/Cellar/apple-gcc42/4.2.1-5666.3/bin/gcc-4.2
-export CXX=/usr/local/Cellar/apple-gcc42/4.2.1-5666.3/bin/g++-4.2
-export CPP=/usr/local/Cellar/apple-gcc42/4.2.1-5666.3/bin/cpp-4.2
+  export CC=/usr/local/Cellar/apple-gcc42/4.2.1-5666.3/bin/gcc-4.2
+  export CXX=/usr/local/Cellar/apple-gcc42/4.2.1-5666.3/bin/g++-4.2
+  export CPP=/usr/local/Cellar/apple-gcc42/4.2.1-5666.3/bin/cpp-4.2
 
-PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
+  PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
+fi
