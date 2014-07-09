@@ -1,26 +1,21 @@
-ZSH=$HOME/.oh-my-zsh
-
 ZSH_THEME="norm"
 COMPLETION_WAITING_DOTS="true"
 
 platform='unknown'
 unamestr=$(uname)
 if [[ "$unamestr" == 'Linux' ]]; then
-   platform='linux'
+    platform='linux'
 elif [[ "$unamestr" == 'Darwin' ]]; then
-   platform='osx'
+    platform='osx'
 fi
 
 function linux() {
-  [[ $platform == 'linux' ]]
+    [[ $platform == 'linux' ]]
 }
 
 function osx() {
-  [[ $platform == 'osx' ]]
+    [[ $platform == 'osx' ]]
 }
-
-# Path
-export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:$PATH
 
 plugins=(git
          github
@@ -50,11 +45,11 @@ colors
 export HISTFILE=$HOME/.zsh_history
 export HISTSIZE=10000
 export SAVEHIST=10000
-setopt EXTENDED_HISTORY # add timestamps to history
-setopt APPEND_HISTORY # adds history
-setopt INC_APPEND_HISTORY # adds history incrementally
-setopt SHARE_HISTORY # share across sessions
-setopt HIST_IGNORE_ALL_DUPS  # don't record dupes in history
+setopt EXTENDED_HISTORY     # add timestamps to history
+setopt APPEND_HISTORY       # adds history
+setopt INC_APPEND_HISTORY   # adds history incrementally
+setopt SHARE_HISTORY        # share across sessions
+setopt HIST_IGNORE_ALL_DUPS # don't record dupes in history
 setopt HIST_IGNORE_DUPS
 setopt HIST_REDUCE_BLANKS
 unsetopt correct_all
@@ -79,62 +74,82 @@ set -o emacs
 # Load other config files
 for config_file ($HOME/.zsh/*.zsh(.N)) source $config_file
 
-# differences between osx and linux
 if linux; then
-  promptcolor1='green'
-  promptcolor2='blue'
-  alias ls='ls --color'
+    prompt_branch_color='green'
+    prompt_dir_color='blue'
+    prompt_vm_color='cyan'
+    alias ls='ls --color'
+
+    source /usr/local/share/chruby/chruby.sh
 else
-  promptcolor1='yellow'
-  promptcolor2='red'
-  alias ls='ls -G'
+    prompt_branch_color='yellow'
+    prompt_dir_color='red'
+    alias ls='ls -G'
+
+    source $(brew --prefix)/etc/profile.d/z.sh
+    source /Users/ben/.rvm/scripts/rvm
+
+    source ~/.zsh/export_homebrew_github_api_token.sh
+
+    export CC=/usr/local/Cellar/apple-gcc42/4.2.1-5666.3/bin/gcc-4.2
+    export CXX=/usr/local/Cellar/apple-gcc42/4.2.1-5666.3/bin/g++-4.2
+    export CPP=/usr/local/Cellar/apple-gcc42/4.2.1-5666.3/bin/cpp-4.2
+
+    PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
 fi
 
-# prompt
-export PATH=$HOME/.bin:$PATH
-
 function vm_has_a_name() {
-  grep -q 'config.vm.define' /vagrant/Vagrantfile
+    grep -q 'config.vm.define' /vagrant/Vagrantfile
 }
 
-# tells me which vm I'm in
-function vm_prompt_info() {
-  if linux; then
+function linux_vm_name() {
     if vm_has_a_name; then
-       grep config.vm.define /vagrant/Vagrantfile | awk -F' ' '{print $2}' | awk -F' ' '{print $2}'
+        grep config.vm.define /vagrant/Vagrantfile | awk -F' ' '{print $2}' | awk -F' ' '{print $2}'
     else
-      echo '8b'
+        echo '8b'
     fi
-  else
-    echo 'OSX'
-  fi
 }
 
-function git_prompt_info() {
-  ref=$($(which git) symbolic-ref HEAD 2> /dev/null) || return
-  user=$($(which git) config user.name 2> /dev/null)
-  echo "${ref#refs/heads/}"
+function current_vm() {
+    if osx; then
+        echo ''
+    else
+        echo "[$(change_color $prompt_vm_color $(linux_vm_name))] "
+    fi
 }
 
 function current_info() {
-  echo "%{$fg_bold[$promptcolor1]%}$(vm_prompt_info) @ $(git_prompt_info)%{$reset_color%}"
+    echo "%{$fg_bold[$prompt_branch_color]%}$(vm_prompt_info) @ $(git_branch)%{$reset_color%}"
+}
+
+function change_color() {
+    echo "%{$fg_bold[$1]%}$2%{$reset_color%}"
 }
 
 function current_dir() {
-  echo "%{$fg_bold[$promptcolor2]%}%~%{$reset_color%}"
+    echo "[$(change_color $prompt_dir_color %~)]"
 }
 
-export PS1='[$(current_info)][$(current_dir)] '
+function current_branch() {
+    if [[ -a .git/refs/heads ]]; then
+        ref=$($(which git) symbolic-ref HEAD 2> /dev/null) || return
+        echo "[$(change_color $prompt_branch_color ${ref#refs/heads/})] "
+    else
+        echo ""
+    fi
+}
+
+export PS1='$(current_vm)$(current_branch)$(current_dir) '
+
+# export PS1='[$(current_info)] $(current_branch)[$(current_dir)] '
 
 # aliases
-# ls
 alias l='ls -lhpG'
 alias lsa='ls -lhpA'
 
 alias c='command'
 alias e='emacs'
 
-# use color with grep
 alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
@@ -145,48 +160,25 @@ alias t2='tree -C --dirsfirst -L 2'
 # make aliases work with "sudo"
 alias sudo='sudo '
 
-# better `echo $PATH` output
 alias showpath="echo $PATH | tr : '\n'"
 
 # let tmux use 256 colors
 alias tmux='tmux -2'
 
-# rails
 alias be='bundle exec'
 alias s='spring'
 
-# git aliases
 alias gl="git log --graph --date=short --format=format:'%C(blue)%h%C(white) %C(240)- %C(white)%s%C(240) -- %an, %ad'"
 alias gd='git diff'
 alias gs='git status'
 alias gb='git branch'
 
-# start/stop postgres
 alias pgstart="pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server.log start"
 alias pgstop="pg_ctl -D /usr/local/bin/postgres stop -s -m fast"
 
-# other
 alias scm='scheme-r5rs'
 alias wget_mirror='wget --mirror -p --html-extension --convert-links'
 
-if [[ -a /Users/ben/.rvm/scripts/rvm ]]; then
-  source /Users/ben/.rvm/scripts/rvm
-fi
-
 if [[ -a ~/.vpn_functions ]]; then
-  source ~/.vpn_functions
-fi
-
-if osx; then
-  source $(brew --prefix)/etc/profile.d/z.sh
-
-  source ~/.zsh/export_homebrew_github_api_token.sh
-
-  export CC=/usr/local/Cellar/apple-gcc42/4.2.1-5666.3/bin/gcc-4.2
-  export CXX=/usr/local/Cellar/apple-gcc42/4.2.1-5666.3/bin/g++-4.2
-  export CPP=/usr/local/Cellar/apple-gcc42/4.2.1-5666.3/bin/cpp-4.2
-
-  PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
-else
-  source /usr/local/share/chruby/chruby.sh
+    source ~/.vpn_functions
 fi
