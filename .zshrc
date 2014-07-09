@@ -17,6 +17,8 @@ function osx() {
     [[ $platform == 'osx' ]]
 }
 
+export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
 plugins=(git
          github
          heroku
@@ -74,28 +76,27 @@ set -o emacs
 # Load other config files
 for config_file ($HOME/.zsh/*.zsh(.N)) source $config_file
 
+source /usr/local/share/chruby/chruby.sh
+source /usr/local/share/chruby/auto.sh
+chruby ruby 2.1
+
 if linux; then
     prompt_branch_color='green'
     prompt_dir_color='blue'
     prompt_vm_color='cyan'
     alias ls='ls --color'
-
-    source /usr/local/share/chruby/chruby.sh
 else
     prompt_branch_color='yellow'
     prompt_dir_color='red'
     alias ls='ls -G'
 
     source $(brew --prefix)/etc/profile.d/z.sh
-    source /Users/ben/.rvm/scripts/rvm
 
     source ~/.zsh/export_homebrew_github_api_token.sh
 
     export CC=/usr/local/Cellar/apple-gcc42/4.2.1-5666.3/bin/gcc-4.2
     export CXX=/usr/local/Cellar/apple-gcc42/4.2.1-5666.3/bin/g++-4.2
     export CPP=/usr/local/Cellar/apple-gcc42/4.2.1-5666.3/bin/cpp-4.2
-
-    PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
 fi
 
 function vm_has_a_name() {
