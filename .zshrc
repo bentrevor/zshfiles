@@ -11,6 +11,14 @@ elif [[ "$unamestr" == 'Darwin' ]]; then
    platform='osx'
 fi
 
+function linux() {
+  [[ $platform == 'linux' ]]
+}
+
+function osx() {
+  [[ $platform == 'osx' ]]
+}
+
 # Path
 export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:$PATH
 
@@ -72,11 +80,11 @@ set -o emacs
 for config_file ($HOME/.zsh/*.zsh(.N)) source $config_file
 
 # differences between osx and linux
-if [[ $platform == 'linux' ]]; then
+if linux; then
   promptcolor1='green'
   promptcolor2='blue'
   alias ls='ls --color'
-elif [[ $platform == 'osx' ]]; then
+else
   promptcolor1='yellow'
   promptcolor2='red'
   alias ls='ls -G'
@@ -85,9 +93,20 @@ fi
 # prompt
 export PATH=$HOME/.bin:$PATH
 
+function vm_has_a_name() {
+  grep -q 'config.vm.define' /vagrant/Vagrantfile
+}
+
+# tells me which vm I'm in
 function vm_prompt_info() {
-  if [[ $platform == 'linux' ]]; then
-    cat /vagrant/Vagrantfile | grep config.vm.define | awk -F' ' '{print $2}' | awk -F: '{print $2}'
+  if linux; then
+    if vm_has_a_name; then
+       grep config.vm.define /vagrant/Vagrantfile | awk -F' ' '{print $2}' | awk -F' ' '{print $2}'
+    else
+      echo '8b'
+    fi
+  else
+    echo 'OSX'
   fi
 }
 
@@ -158,7 +177,7 @@ if [[ -a ~/.vpn_functions ]]; then
   source ~/.vpn_functions
 fi
 
-if [[ $platform == 'osx' ]]; then
+if osx; then
   source $(brew --prefix)/etc/profile.d/z.sh
 
   source ~/.zsh/export_homebrew_github_api_token.sh
@@ -168,4 +187,6 @@ if [[ $platform == 'osx' ]]; then
   export CPP=/usr/local/Cellar/apple-gcc42/4.2.1-5666.3/bin/cpp-4.2
 
   PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
+else
+  source /usr/local/share/chruby/chruby.sh
 fi
