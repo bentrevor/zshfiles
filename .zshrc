@@ -111,6 +111,10 @@ function linux_vm_name() {
     fi
 }
 
+function change_color() {
+    echo "%{$fg_bold[$1]%}$2%{$reset_color%}"
+}
+
 function current_vm() {
     if osx; then
         echo ''
@@ -119,20 +123,13 @@ function current_vm() {
     fi
 }
 
-function current_info() {
-    echo "%{$fg_bold[$prompt_branch_color]%}$(vm_prompt_info) @ $(git_branch)%{$reset_color%}"
-}
-
-function change_color() {
-    echo "%{$fg_bold[$1]%}$2%{$reset_color%}"
-}
-
 function current_dir() {
     echo "[$(change_color $prompt_dir_color %~)]"
 }
 
 function current_branch() {
-    if [[ -a .git/refs/heads ]]; then
+    # should figure out a better way to do this
+    if [[ -a .git/refs/heads ]] || [[ -a ../.git/refs/heads ]] || [[ -a ../../.git/refs/heads ]]; then
         ref=$($(which git) symbolic-ref HEAD 2> /dev/null) || return
         echo "[$(change_color $prompt_branch_color ${ref#refs/heads/})] "
     else
@@ -142,13 +139,10 @@ function current_branch() {
 
 export PS1='$(current_vm)$(current_branch)$(current_dir) '
 
-# export PS1='[$(current_info)] $(current_branch)[$(current_dir)] '
-
 # aliases
 alias l='ls -lhpG'
 alias lsa='ls -lhpA'
 
-alias c='command'
 alias e='emacs'
 
 alias grep='grep --color=auto'
@@ -167,7 +161,6 @@ alias showpath="echo $PATH | tr : '\n'"
 alias tmux='tmux -2'
 
 alias be='bundle exec'
-alias s='spring'
 
 alias gl="git log --graph --date=short --format=format:'%C(blue)%h%C(white) %C(240)- %C(white)%s%C(240) -- %an, %ad'"
 alias gd='git diff'
