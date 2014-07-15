@@ -85,6 +85,8 @@ if linux; then
     prompt_dir_color='blue'
     prompt_vm_color='cyan'
     alias ls='ls --color'
+
+    export PATH=~/8b/bin:$PATH
 else
     prompt_branch_color='yellow'
     prompt_dir_color='red'
