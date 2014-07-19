@@ -106,10 +106,8 @@ function vm_has_a_name() {
 }
 
 function linux_vm_name() {
-    if vm_has_a_name; then
-        grep config.vm.define /vagrant/Vagrantfile | awk -F' ' '{print $2}' | awk -F' ' '{print $2}'
-    else
-        echo '8b'
+    if [[ -e /vagrant/.vm-name ]]; then
+        cat /vagrant/.vm-name
     fi
 }
 
