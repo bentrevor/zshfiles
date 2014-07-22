@@ -169,6 +169,8 @@ alias gb='git branch'
 
 alias pgstart="pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server.log start"
 alias pgstop="pg_ctl -D /usr/local/bin/postgres stop -s -m fast"
+alias pryr="pry -r ./config/environment -r rails/console/app -r rails/console/helpers"
+alias enova="cd ~/8b/brands/netcredit"
 
 alias scm='scheme-r5rs'
 alias wget_mirror='wget --mirror -p --html-extension --convert-links'
