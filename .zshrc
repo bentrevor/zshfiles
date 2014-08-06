@@ -106,8 +106,8 @@ function vm_has_a_name() {
 }
 
 function linux_vm_name() {
-    if [[ -e /vagrant/.vm-name ]]; then
-        cat /vagrant/.vm-name
+    if [[ -e "$HOME/.vm-name" ]]; then
+        cat "$HOME/.vm-name"
     fi
 }
 
@@ -174,7 +174,11 @@ alias enova="cd ~/8b/brands/netcredit"
 
 alias scm='scheme-r5rs'
 alias wget_mirror='wget --mirror -p --html-extension --convert-links'
+alias df='df -h' # human-readable output
 
 if [[ -a ~/.vpn_functions ]]; then
     source ~/.vpn_functions
 fi
+
+export FIX_VPN_POW=yes
+export FIX_VPN_MINIRAISER=yes
