@@ -128,7 +128,6 @@ function current_dir() {
 }
 
 function current_branch() {
-    # should figure out a better way to do this
     if [[ -a .git/refs/heads ]] || [[ -a ../.git/refs/heads ]] || [[ -a ../../.git/refs/heads ]]; then
         ref=$($(which git) symbolic-ref HEAD 2> /dev/null) || return
         echo "[$(change_color $prompt_branch_color ${ref#refs/heads/})] "
