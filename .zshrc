@@ -181,3 +181,16 @@ fi
 
 export FIX_VPN_POW=yes
 export FIX_VPN_MINIRAISER=yes
+
+function gemp() {
+    project=$(basename $(pwd))
+    project_gems=~/.gem/repos/${project}
+
+    mkdir -p ${project_gems}
+    export GEM_HOME=${project_gems}
+    export PATH=${PATH}:${GEM_HOME}/bin
+
+    split_gem_path=$(echo $GEM_PATH | sed 's/:/\\n\\t\\t/g')
+    echo "New \$GEM_HOME:  $GEM_HOME"
+    echo "New \$GEM_PATH:  $split_gem_path"
+}
