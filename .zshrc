@@ -188,9 +188,11 @@ function gemp() {
 
     mkdir -p ${project_gems}
     export GEM_HOME=${project_gems}
-    export PATH=${PATH}:${GEM_HOME}/bin
+    export PATH=${GEM_HOME}/bin:${PATH}
 
     split_gem_path=$(echo $GEM_PATH | sed 's/:/\\n\\t\\t/g')
-    echo "New \$GEM_HOME:  $GEM_HOME"
-    echo "New \$GEM_PATH:  $split_gem_path"
+    split_path=$(echo $PATH | sed 's/:/\\n\\t\\t/g')
+    echo "New \$GEM_HOME:  $GEM_HOME\n"
+    echo "New \$GEM_PATH:  $split_gem_path\n"
+    echo "New \$PATH:  $split_path\n"
 }
