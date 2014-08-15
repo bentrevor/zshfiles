@@ -17,7 +17,8 @@ function osx() {
     [[ $platform == 'osx' ]]
 }
 
-export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+export DEFAULT_PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+export PATH=$DEFAULT_PATH
 
 plugins=(git
          github
@@ -79,6 +80,9 @@ for config_file ($HOME/.zsh/*.zsh(.N)) source $config_file
 source /usr/local/share/chruby/chruby.sh
 source /usr/local/share/chruby/auto.sh
 chruby ruby 2.1
+
+export DEFAULT_GEM_HOME=$GEM_HOME
+export DEFAULT_GEM_PATH=$GEM_PATH
 
 if linux; then
     prompt_branch_color='green'
@@ -182,17 +186,62 @@ fi
 export FIX_VPN_POW=yes
 export FIX_VPN_MINIRAISER=yes
 
+function in_git_project() {
+    [[ -e ./.git ]]
+}
+
+export GEM_REPOS=~/.gem/repos
+
+
 function gemp() {
-    project=$(basename $(pwd))
-    project_gems=~/.gem/repos/${project}
+    if ! in_git_project; then
+        echo '`git init` first'
+    else
+        project=$(basename $(pwd))
 
-    mkdir -p ${project_gems}
-    export GEM_HOME=${project_gems}
-    export PATH=${GEM_HOME}/bin:${PATH}
+        new_gem_home=$GEM_REPOS/$project
+        new_path=$new_gem_home/bin:$PATH
 
-    split_gem_path=$(echo $GEM_PATH | sed 's/:/\\n\\t\\t/g')
-    split_path=$(echo $PATH | sed 's/:/\\n\\t\\t/g')
-    echo "New \$GEM_HOME:  $GEM_HOME\n"
-    echo "New \$GEM_PATH:  $split_gem_path\n"
-    echo "New \$PATH:  $split_path\n"
+        printable_gem_path=$(echo $GEM_PATH | sed 's/:/\\n\\t\\t/g')
+        printable_path=$(echo $new_path | sed 's/:/\\n\\t\\t/g')
+
+        changes="New \$GEM_HOME:\t$new_gem_home\n\n\$GEM_PATH:\t$printable_gem_path\n\nNew \$PATH:\t$printable_path\n\n"
+
+        case "$1" in
+	    -h|--help)
+	        echo "Usage: TODO"
+	        ;;
+            --dry-run)
+                echo $changes
+                ;;
+	    list)
+	        ls -l $GEM_REPOS
+	        ;;
+            reset)
+                export PATH=$DEFAULT_PATH
+                export GEM_HOME=$DEFAULT_GEM_HOME
+                export GEM_PATH=$DEFAULT_GEM_PATH
+                ;;
+	    "")
+                mkdir -p ${new_gem_home}
+                export GEM_HOME=${new_gem_home}
+                export PATH=${new_path}
+
+                echo $changes
+	        ;;
+        esac
+    fi
+}
+
+# gets executed whenever the pwd changes, can run a list of functions by making chpwd_functions array
+function chpwd() {
+    local project=$(basename $PWD)
+
+    if in_git_project; then
+        if [[ -d $GEM_REPOS/$project ]]; then
+            echo "gem repo $project already exists"
+        else
+            echo "gem repo $project doesn't exist yet - create it with \`gemp\`"
+        fi
+    fi
 }
