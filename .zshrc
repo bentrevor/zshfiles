@@ -194,43 +194,43 @@ export GEM_REPOS=~/.gem/repos
 
 
 function gemp() {
-    if ! in_git_project; then
-        echo '`git init` first'
-    else
-        project=$(basename $(pwd))
+    project=$(basename $(pwd))
 
-        new_gem_home=$GEM_REPOS/$project
-        new_path=$new_gem_home/bin:$PATH
+    new_gem_home=$GEM_REPOS/$project
+    new_path=$new_gem_home/bin:$PATH
 
-        printable_gem_path=$(echo $GEM_PATH | sed 's/:/\\n\\t\\t/g')
-        printable_path=$(echo $new_path | sed 's/:/\\n\\t\\t/g')
+    printable_gem_path=$(echo $GEM_PATH | sed 's/:/\\n\\t\\t/g')
+    printable_path=$(echo $new_path | sed 's/:/\\n\\t\\t/g')
 
-        changes="New \$GEM_HOME:\t$new_gem_home\n\n\$GEM_PATH:\t$printable_gem_path\n\nNew \$PATH:\t$printable_path\n\n"
+    changes="New \$GEM_HOME:\t$new_gem_home\n\n\$GEM_PATH:\t$printable_gem_path\n\nNew \$PATH:\t$printable_path\n\n"
 
-        case "$1" in
-	    -h|--help)
-	        echo "Usage: TODO"
-	        ;;
-            --dry-run)
-                echo $changes
-                ;;
-	    list)
-	        ls -l $GEM_REPOS
-	        ;;
-            reset)
-                export PATH=$DEFAULT_PATH
-                export GEM_HOME=$DEFAULT_GEM_HOME
-                export GEM_PATH=$DEFAULT_GEM_PATH
-                ;;
-	    "")
+    case "$1" in
+	-h|--help)
+	    echo "Usage: TODO"
+	    ;;
+        --dry-run)
+            echo $changes
+            ;;
+	list)
+	    ls -l $GEM_REPOS
+	    ;;
+        reset)
+            export PATH=$DEFAULT_PATH
+            export GEM_HOME=$DEFAULT_GEM_HOME
+            export GEM_PATH=$DEFAULT_GEM_PATH
+            ;;
+	"")
+            if ! in_git_project; then
+                echo '`git init` first'
+            else
                 mkdir -p ${new_gem_home}
                 export GEM_HOME=${new_gem_home}
                 export PATH=${new_path}
 
                 echo $changes
-	        ;;
-        esac
-    fi
+            fi
+	    ;;
+    esac
 }
 
 # gets executed whenever the pwd changes, can run a list of functions by making chpwd_functions array
