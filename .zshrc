@@ -77,8 +77,8 @@ set -o emacs
 # Load other config files
 for config_file ($HOME/.zsh/*.zsh(.N)) source $config_file
 
-source /usr/local/share/chruby/chruby.sh
-source /usr/local/share/chruby/auto.sh
+source ~/junk_drawer/scripts/chruby.sh
+source ~/junk_drawer/scripts/auto.sh
 chruby ruby 2.1
 
 export DEFAULT_GEM_HOME=$GEM_HOME
@@ -186,12 +186,11 @@ fi
 export FIX_VPN_POW=yes
 export FIX_VPN_MINIRAISER=yes
 
-function in_git_project() {
-    [[ -e ./.git ]]
+function in_ruby_project() {
+    [[ -e ./.git ]] && [[ -e ./Gemfile ]]
 }
 
 export GEM_REPOS=~/.gem/repos
-
 
 function gemp() {
     project=$(basename $(pwd))
@@ -208,19 +207,23 @@ function gemp() {
 	-h|--help)
 	    echo "Usage: TODO"
 	    ;;
+
         --dry-run)
             echo $changes
             ;;
+
 	list)
 	    ls -l $GEM_REPOS
 	    ;;
+
         reset)
             export PATH=$DEFAULT_PATH
             export GEM_HOME=$DEFAULT_GEM_HOME
             export GEM_PATH=$DEFAULT_GEM_PATH
             ;;
+
 	"")
-            if ! in_git_project; then
+            if ! in_ruby_project; then
                 echo '`git init` first'
             else
                 mkdir -p ${new_gem_home}
@@ -237,7 +240,7 @@ function gemp() {
 function chpwd() {
     local project=$(basename $PWD)
 
-    if in_git_project; then
+    if in_ruby_project; then
         if [[ -d $GEM_REPOS/$project ]]; then
             echo "gem repo $project already exists"
         else
