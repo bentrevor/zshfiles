@@ -190,18 +190,28 @@ function in_ruby_project() {
     [[ -e ./.git ]] && [[ -e ./Gemfile ]]
 }
 
-export GEM_REPOS=~/.gem/repos
+export GEM_GROUP_DIR=~/.gem/groups
+mkdir -p $GEM_GROUP_DIR
 
-function gemp() {
-    project=$(basename $(pwd))
+function hot_pink() {
+    echo "$(tput setaf 13)$1$(tput sgr0)"
+}
 
-    new_gem_home=$GEM_REPOS/$project
-    new_path=$new_gem_home/bin:$PATH
+function hot_green() {
+    echo "$(tput setaf 10)$1$(tput sgr0)"
+}
 
-    printable_gem_path=$(echo $GEM_PATH | sed 's/:/\\n\\t\\t/g')
-    printable_path=$(echo $new_path | sed 's/:/\\n\\t\\t/g')
+# gem groups
+function gg() {
+    group=$(basename $(pwd))
 
-    changes="New \$GEM_HOME:\t$new_gem_home\n\n\$GEM_PATH:\t$printable_gem_path\n\nNew \$PATH:\t$printable_path\n\n"
+    local new_gem_home=$GEM_GROUP_DIR/$group
+    local new_path=$new_gem_home/bin:$PATH
+
+    local printable_gem_path=$(echo $GEM_PATH | sed 's/:/\\n\\t\\t/g')
+    local printable_path=$(echo $new_path | sed 's/:/\\n\\t\\t/g')
+
+    changes="New $(hot_pink \$GEM_HOME):\t$new_gem_home\n\n$(hot_pink \$GEM_PATH):\t$printable_gem_path\n\nNew $(hot_pink \$PATH):\t$printable_path\n\n"
 
     case "$1" in
 	-h|--help)
@@ -212,8 +222,8 @@ function gemp() {
             echo $changes
             ;;
 
-	list)
-	    ls -l $GEM_REPOS
+	list|-l)
+	    ls -l $GEM_GROUP_DIR
 	    ;;
 
         reset)
@@ -222,9 +232,24 @@ function gemp() {
             export GEM_PATH=$DEFAULT_GEM_PATH
             ;;
 
+        remove)
+            echo "removing gem group $(hot_pink $2)"
+            rm -rf $GEM_GROUP_DIR/$2
+            ;;
+
+        dir)
+            echo $GEM_GROUP_DIR
+            ;;
+
+        use)
+            echo "using gem group $(hot_pink $2)"
+            gg $2
+            ;;
+
+        # use the current directory name by default
 	"")
             if ! in_ruby_project; then
-                echo '`git init` first'
+                echo "$(hot_pink 'git init') first"
             else
                 mkdir -p ${new_gem_home}
                 export GEM_HOME=${new_gem_home}
@@ -238,13 +263,13 @@ function gemp() {
 
 # gets executed whenever the pwd changes, can run a list of functions by making chpwd_functions array
 function chpwd() {
-    local project=$(basename $PWD)
+    local group=$(basename $PWD)
 
     if in_ruby_project; then
-        if [[ -d $GEM_REPOS/$project ]]; then
-            echo "gem repo $project already exists"
+        if [[ -d $GEM_GROUP_DIR/$group ]]; then
+            echo "using gem group $(hot_pink $group)"
         else
-            echo "gem repo $project doesn't exist yet - create it with \`gemp\`"
+            echo "gem group $(hot_pink $group) doesn't exist yet - create it with \`gg\`"
         fi
     fi
 }
