@@ -190,6 +190,7 @@ function in_ruby_project() {
     [[ -e ./.git ]] && [[ -e ./Gemfile ]]
 }
 
+export GEM_GROUP_AUTOSWITCH=true
 export GEM_GROUP_DIR=~/.gem/groups
 mkdir -p $GEM_GROUP_DIR
 
@@ -242,14 +243,15 @@ function gg() {
             ;;
 
         use)
-            echo "using gem group $(hot_pink $2)"
+            echo "using gem group $(hot_green $2)"
             gg $2
             ;;
 
         # use the current directory name by default
 	"")
             if ! in_ruby_project; then
-                echo "$(hot_pink 'git init') first"
+                [[ -e ./.git ]] || echo "can't create gem group without git repo"
+                [[ -e ./Gemfile ]] || echo "can't create gem group without a Gemfile"
             else
                 mkdir -p ${new_gem_home}
                 export GEM_HOME=${new_gem_home}
@@ -267,9 +269,18 @@ function chpwd() {
 
     if in_ruby_project; then
         if [[ -d $GEM_GROUP_DIR/$group ]]; then
-            echo "using gem group $(hot_pink $group)"
+            if [[ "$GEM_GROUP_AUTOSWITCH" = true ]]; then
+                echo "using gem group $(hot_green $group)"
+                gg
+            else
+                echo "found gem group $(hot_green $group)"
+            fi
         else
-            echo "gem group $(hot_pink $group) doesn't exist yet - create it with \`gg\`"
+            echo "gem group $(hot_pink $group) doesn't exist yet"
         fi
     fi
 }
+
+if [[ $PWD != ~ ]]; then
+    gg
+fi
