@@ -189,6 +189,14 @@ function show-path() {
     echo $PATH | tr ':' '\n'
 }
 
+function show-colors() {
+    source ~/junk_drawer/scripts/color_functions.sh --debug
+}
+
+function show-bold-colors() {
+    source ~/junk_drawer/scripts/color_functions.sh --bold
+}
+
 export FIX_VPN_POW=yes
 export FIX_VPN_MINIRAISER=yes
 
