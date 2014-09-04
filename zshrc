@@ -83,6 +83,7 @@ zstyle ':completion:*:default' menu 'select=0' # menu-style
 export CLICOLOR=1
 autoload colors
 colors
+source ~/junk_drawer/scripts/color_functions.sh # Color helper functions
 
 # History
 export HISTFILE=$HOME/.zsh_history
@@ -117,55 +118,33 @@ set -o emacs
 # Load other config files (syntax highlighting)
 for config_file ($HOME/.zsh/*.zsh(.N)) source $config_file
 
-# Color helper functions
-source ~/junk_drawer/scripts/color_functions.sh
-
 if linux; then
-    prompt_branch_color='green'
-    prompt_dir_color='blue'
-    prompt_vm_color='cyan'
     alias ls='ls --color'
 else
-    prompt_branch_color='yellow'
-    prompt_dir_color='red'
     alias ls='ls -G'
 
     source $(brew --prefix)/etc/profile.d/z.sh
     source ~/.zsh/export_homebrew_github_api_token.sh
 fi
 
-function linux_vm_name() {
-    if [[ -e "$HOME/.vm-name" ]]; then
-        cat "$HOME/.vm-name"
-    fi
-}
-
 function change_color() {
     echo "%{$fg_bold[$1]%}$2%{$reset_color%}"
 }
 
-function current_vm() {
-    if osx; then
-        echo ''
-    else
-        echo "[$(change_color $prompt_vm_color $(linux_vm_name))] "
-    fi
-}
-
 function current_dir() {
-    echo "[$(change_color $prompt_dir_color %~)]"
+    echo "[$(dull_blue %~)]"
 }
 
 function current_branch() {
     if [[ -a .git/refs/heads ]] || [[ -a ../.git/refs/heads ]] || [[ -a ../../.git/refs/heads ]]; then
         ref=$($(which git) symbolic-ref HEAD 2> /dev/null) || return
-        echo "[$(change_color $prompt_branch_color ${ref#refs/heads/})] "
+        echo "[$(tput bold)$(hot_cyan ${ref#refs/heads/})] "
     else
         echo ""
     fi
 }
 
-export PS1='$(current_vm)$(current_branch)$(current_dir) '
+export PS1='$(current_branch)$(current_dir) '
 
 # aliases
 alias l='ls -lhpG'
@@ -427,7 +406,8 @@ function chruby()
             done
 
             if [[ -z "$match" ]]; then
-                echo "chruby: unknown Ruby: $1" >&2
+                local no_match="chruby: unknown Ruby: $1"
+                echo "\n  $(dull_red $no_match)\n" >&2
                 return 1
             fi
 
