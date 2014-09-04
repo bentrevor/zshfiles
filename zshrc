@@ -131,12 +131,7 @@ else
     alias ls='ls -G'
 
     source $(brew --prefix)/etc/profile.d/z.sh
-
     source ~/.zsh/export_homebrew_github_api_token.sh
-
-    # export CC=/usr/local/Cellar/apple-gcc42/4.2.1-5666.3/bin/gcc-4.2
-    # export CXX=/usr/local/Cellar/apple-gcc42/4.2.1-5666.3/bin/g++-4.2
-    # export CPP=/usr/local/Cellar/apple-gcc42/4.2.1-5666.3/bin/cpp-4.2
 fi
 
 function linux_vm_name() {
@@ -276,26 +271,6 @@ function gg() {
     esac
 }
 
-# function autoswitch_gem_group() {
-#     local group=$(basename $PWD)
-
-#     if in_ruby_project; then
-#         if [[ -d $GEM_GROUP_DIR/$group ]]; then
-#             if [[ "$GEM_GROUP_AUTOSWITCH" = true ]]; then
-#                 echo "using gem group $(hot_green $group)"
-#                 gg
-#             else
-#                 echo "found gem group $(hot_green $group)"
-#             fi
-#         else
-#             echo "gem group $(hot_magenta $group) doesn't exist yet"
-#             unset GEM_GROUP
-#         fi
-#     else
-#         unset GEM_GROUP
-#     fi
-# }
-
 # TODO consolidate these
 function find_gemfile() {
     IN_RUBY_PROJECT=false
@@ -332,136 +307,6 @@ function in_ruby_project() {
     [[ $IN_GIT_REPO = true ]] && [[ $IN_RUBY_PROJECT = true ]]
 }
 
-# # chruby's chruby.sh
-# CHRUBY_VERSION="0.3.8"
-# RUBIES=()
-
-# # find all ruby versions in ~/.rubies and add them to $RUBIES
-# for dir in "$PREFIX/opt/rubies" "$HOME/.rubies"; do
-#     [[ -d "$dir" && -n "$(ls -A "$dir")" ]] && RUBIES+=("$dir"/*)
-# done
-# unset dir
-
-
-# function chruby_reset()
-# {
-#     [[ -z "$RUBY_ROOT" ]] && return
-
-#     # pad $PATH with colons, remove $RUBY_ROOT/bin from $PATH
-#     PATH=":$PATH:"; PATH="${PATH//:$RUBY_ROOT\/bin:/:}"
-
-#     # if not root
-#     if (( $UID != 0 )); then
-#         # remove GEM_{HOME,ROOT}/bin from PATH
-#         [[ -n "$GEM_HOME" ]] && PATH="${PATH//:$GEM_HOME\/bin:/:}"
-#         [[ -n "$GEM_ROOT" ]] && PATH="${PATH//:$GEM_ROOT\/bin:/:}"
-
-#         # remove GEM_{HOME,ROOT} from $GEM_PATH
-#         GEM_PATH=":$GEM_PATH:"
-#         GEM_PATH="${GEM_PATH//:$GEM_HOME:/:}"
-#         GEM_PATH="${GEM_PATH//:$GEM_ROOT:/:}"
-#         GEM_PATH="${GEM_PATH#:}"; GEM_PATH="${GEM_PATH%:}"
-#         [[ -z "$GEM_PATH" ]] && unset GEM_PATH
-#         unset GEM_ROOT GEM_HOME
-#     fi
-
-#     PATH="${PATH#:}"; PATH="${PATH%:}"
-#     unset RUBY_ROOT RUBY_ENGINE RUBY_VERSION RUBYOPT
-#     hash -r
-# }
-
-# function paths() {
-#     echo 'path:'
-#     echo $PATH | tr ':' '\n'
-#     echo ''
-#     echo 'gem path:'
-#     echo $GEM_PATH | tr ':' '\n'
-#     echo ''
-# }
-
-# function chruby_use()
-# {
-#     if [[ ! -x "$1/bin/ruby" ]]; then
-#         echo "chruby: $1/bin/ruby not executable" >&2
-#         return 1
-#     fi
-
-#     [[ -n "$RUBY_ROOT" ]] && chruby_reset
-
-#     export RUBY_ROOT="$1"
-#     export RUBY_OPT="$2"
-#     export PATH="$RUBY_ROOT/bin:$PATH"
-
-#     eval "$("$RUBY_ROOT/bin/ruby" - <<EOF
-# begin; require 'rubygems'; rescue LoadError; end
-# puts "export RUBY_VERSION=#{RUBY_VERSION};"
-# EOF
-# )"
-# }
-
-# function chruby()
-# {
-#     case "$1" in
-#         -h|--help)
-#             echo "usage: chruby [RUBY|VERSION|system] [RUBY_OPTS]"
-#             ;;
-#         -V|--version)
-#             echo "chruby: $CHRUBY_VERSION"
-#             ;;
-#         "")
-#             local dir star
-#             for dir in "${RUBIES[@]}"; do
-#                 dir="${dir%%/}"
-#                 if [[ "$dir" == "$RUBY_ROOT" ]]; then star="*"
-#                 else                                  star=" "
-#                 fi
-
-#                 echo " $star ${dir##*/}"
-#             done
-#             ;;
-#         *)
-#             local dir match
-#             for dir in "${RUBIES[@]}"; do
-#                 dir="${dir%%/}"
-#                 if [[ "${dir##*/}" == *"$1"* ]]; then
-#                     echo "matched ${dir##*/} with *$1*"
-#                     match="$dir"
-#                 fi
-#             done
-
-#             if [[ -z "$match" ]]; then
-#                 echo "chruby: unknown Ruby: $1" >&2
-#                 return 1
-#             fi
-
-#             shift
-#             chruby_use "$match" "$*"
-#             ;;
-#     esac
-# }
-
-# # chruby's auto.sh
-# function autoswitch_ruby() {
-#     local dir="$PWD" version
-
-#     until [[ -z "$dir" ]]; do
-#         if { read -r version <"$dir/.ruby-version"; } 2>/dev/null || [[ -n "$version" ]]; then
-#             if [[ "$version" == "$RUBY_AUTO_VERSION" ]]; then return
-#             else
-#                 RUBY_AUTO_VERSION="$version"
-#                 chruby "$version"
-#                 return $?
-#             fi
-#         fi
-
-#         dir="${dir%/*}"
-#     done
-
-#     if [[ -n "$RUBY_AUTO_VERSION" ]]; then
-#         unset RUBY_AUTO_VERSION
-#     fi
-# }
-
 # ruby environment
 function re() {
     echo ''
@@ -476,9 +321,9 @@ function re() {
     echo "$(hot_magenta RUBY_ROOT) \t=>\t$RUBY_ROOT"
 }
 
-# gets executed whenever the pwd changes, can run a list of functions by making chpwd_functions array
+# gets executed whenever the pwd changes
+# can run a list of functions by making chpwd_functions array
 function chpwd() {
-    # venv
     # autoswitch_ruby
     # autoswitch_gem_group
     # reset_paths
@@ -490,10 +335,6 @@ function chpwd() {
 
 # for debugging
 cat ~/.zshrc > ~/loaded_zshrc
-
-# if [[ $PWD != ~ ]]; then
-#     gg
-# fi
 
 # chruby.sh
 CHRUBY_VERSION="0.3.8"
