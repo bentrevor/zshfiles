@@ -1,22 +1,25 @@
+### ZSH settings ###
 ZSH_THEME="norm"
 COMPLETION_WAITING_DOTS="true"
+plugins=(git github heroku lein battery cp git-extras)
 
 platform='unknown'
-unamestr=$(uname)
-if [[ "$unamestr" == 'Linux' ]]; then
-    platform='linux'
-elif [[ "$unamestr" == 'Darwin' ]]; then
-    platform='osx'
-fi
+[[ $(uname) == 'Linux' ]]  && platform='linux'
+[[ $(uname) == 'Darwin' ]] && platform='osx'
 
-function linux() {
-    [[ $platform == 'linux' ]]
-}
+function linux() { [[ $platform == 'linux' ]] }
+function osx()   { [[ $platform == 'osx' ]]   }
 
-function osx() {
-    [[ $platform == 'osx' ]]
-}
+setopt LOCAL_OPTIONS # allow functions to have local options
+setopt LOCAL_TRAPS   # allow functions to have local traps
+setopt PROMPT_SUBST
+setopt AUTO_CD
+stty -ixon -ixoff    # disable scroll lock
+export EDITOR=vim
+set -o emacs
+for config_file ($HOME/.zsh/*.zsh(.N)) source $config_file # Load other config files (syntax highlighting)
 
+### Path settings ###
 export GEM_GROUP_AUTOSWITCH=true
 export GEM_GROUP_DIR=~/.gem/groups
 mkdir -p $GEM_GROUP_DIR
@@ -29,9 +32,15 @@ function set_gem_group() {
     fi
 }
 
-function set_gem_path()  {
-    export GEM_PATH=$RUBY_ROOT
+# path helper functions
+function reset_paths() {
+    set_gem_path
+    set_gem_home
+
+    export PATH=$(gem_bins):$(ruby_bins):$(global_bins)
 }
+
+function set_gem_path()  { export GEM_PATH=$RUBY_ROOT }
 
 function set_gem_home() {
     if [[ -n $GEM_GROUP ]]; then
@@ -41,51 +50,26 @@ function set_gem_home() {
     fi
 }
 
-function reset_paths() {
-    set_gem_path
-    set_gem_home
+function global_bins() { echo '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin' }
+function ruby_bins()   { echo "$RUBY_ROOT/bin" }
+function gem_bins()    { echo "$GEM_HOME/bin" }
 
-    export PATH=$(gem_bins):$(ruby_bins):$(global_bins)
-}
-
-function global_bins() {
-    echo '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin'
-}
-
-function ruby_bins() {
-    echo "$RUBY_ROOT/bin"
-}
-
-function gem_bins() {
-    echo "$GEM_HOME/bin"
-}
-
-plugins=(git
-    github
-    heroku
-    lein
-    battery
-    cp
-    git-extras)
-
-# Completion
-# add custom completion to fpath
-fpath=(~/.zsh/completion $fpath)
-
+### Completion ###
+fpath=(~/.zsh/completion $fpath) # add custom completion to fpath
 setopt COMPLETE_IN_WORD
 autoload -U compinit
 compinit
 zstyle ':completion::complete:*' use-cache 1
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}' # case insensitive completion
-zstyle ':completion:*:default' menu 'select=0' # menu-style
+zstyle ':completion:*:default' menu 'select=0'      # menu-style
 
-# Colors
+### Colors ###
 export CLICOLOR=1
 autoload colors
 colors
 source ~/junk_drawer/scripts/color_functions.sh # Color helper functions
 
-# History
+### History ###
 export HISTFILE=$HOME/.zsh_history
 export HISTSIZE=10000
 export SAVEHIST=10000
@@ -97,27 +81,15 @@ setopt HIST_IGNORE_ALL_DUPS # don't record dupes in history
 setopt HIST_IGNORE_DUPS
 setopt HIST_REDUCE_BLANKS
 unsetopt correct_all
-bindkey -e # use emacs key bindings
+bindkey -e                                       # use emacs key bindings
 bindkey '^r' history-incremental-search-backward # make Control-r work
-bindkey '^[[Z' reverse-menu-complete
-bindkey "^[[3~" delete-char # make delete key work
-bindkey "^[3;5~" delete-char
-
+bindkey '^[[Z' reverse-menu-complete             # shift-tab to cycle backwards
+bindkey "^[[3~" delete-char                      # make delete key work
+bindkey "^[3;5~" delete-char                     # make delete key work
 autoload -U select-word-style
 select-word-style bash
 
-# Miscellaneous Options
-setopt LOCAL_OPTIONS # allow functions to have local options
-setopt LOCAL_TRAPS # allow functions to have local traps
-setopt PROMPT_SUBST
-setopt AUTO_CD
-stty -ixon -ixoff # disable scroll lock
-export EDITOR=vim
-set -o emacs
-
-# Load other config files (syntax highlighting)
-for config_file ($HOME/.zsh/*.zsh(.N)) source $config_file
-
+### OS-specific settings ###
 if linux; then
     alias ls='ls --color'
 else
@@ -127,26 +99,20 @@ else
     source ~/.zsh/export_homebrew_github_api_token.sh
 fi
 
-function change_color() {
-    echo "%{$fg_bold[$1]%}$2%{$reset_color%}"
-}
-
-function current_dir() {
-    echo "[$(dull_blue %~)]"
-}
-
+### Prompt ###
+function change_color()   { echo "%{$fg_bold[$1]%}$2%{$reset_color%}" }
+function current_dir()    { echo "[$(tput bold)$(hot_blue %~)]" }
 function current_branch() {
     if [[ -a .git/refs/heads ]] || [[ -a ../.git/refs/heads ]] || [[ -a ../../.git/refs/heads ]]; then
         ref=$($(which git) symbolic-ref HEAD 2> /dev/null) || return
-        echo "[$(tput bold)$(hot_cyan ${ref#refs/heads/})] "
+        echo "[$(tput bold)$(hot_green ${ref#refs/heads/})] "
     else
         echo ""
     fi
 }
-
 export PS1='$(current_branch)$(current_dir) '
 
-# aliases
+### Aliases ###
 alias l='ls -lhpG'
 alias lsa='ls -lhpA'
 
@@ -181,33 +147,65 @@ alias scm='scheme-r5rs'
 alias wget_mirror='wget --mirror -p --html-extension --convert-links'
 alias df='df -h' # human-readable output
 
-if [[ -a ~/.vpn_functions ]]; then
-    source ~/.vpn_functions
-fi
-
-function show-path() {
-    echo $PATH | tr ':' '\n'
-}
-
-function show-colors() {
-    source ~/junk_drawer/scripts/color_functions.sh --debug
-}
-
-function show-bold-colors() {
-    source ~/junk_drawer/scripts/color_functions.sh --bold
-}
-
+### Enova ###
+[[ -a ~/.vpn_functions ]] && source ~/.vpn_functions
 export FIX_VPN_POW=yes
 export FIX_VPN_MINIRAISER=yes
 
-# gem groups
+### Helpers ###
+function show-path()        { echo $PATH | tr ':' '\n' }
+function show-colors()      { source ~/junk_drawer/scripts/color_functions.sh --debug }
+function show-bold-colors() { source ~/junk_drawer/scripts/color_functions.sh --bold }
+
+function find_file_in_parent_dirs() {
+    local bool=false
+    local dir="$PWD"
+
+    until [[ -z "$dir" ]]; do
+        if [[ -e "$dir/$1" ]]; then
+            bool=true
+        fi
+
+        dir="${dir%/*}"
+    done
+
+    echo $bool
+}
+
+function find_gemfile() {
+    [[ $(find_file_in_parent_dirs 'Gemfile') = 'true' ]]
+}
+
+function find_git_dir() {
+    [[ $(find_file_in_parent_dirs '.git') = 'true' ]]
+}
+
+function in_ruby_project() {
+    find_gemfile && find_git_dir && echo 'in ruby project'
+}
+
+# ruby environment
+function re() {
+    echo ''
+    echo "$(dull_red PATH:)"
+    show-path
+    echo ''
+    echo "$(dull_red GEM_PATH) \t=>\t$GEM_PATH"
+    echo "$(dull_red GEM_HOME) \t=>\t$GEM_HOME"
+    echo "$(dull_red GEM_ROOT) \t=>\t$GEM_ROOT"
+    echo "$(dull_red GEM_GROUP) \t=>\t$GEM_GROUP"
+    echo "$(dull_red RUBY_ENGINE) \t=>\t$RUBY_ENGINE"
+    echo "$(dull_red RUBY_ROOT) \t=>\t$RUBY_ROOT"
+}
+
+### Gem Groups ###
 function gg() {
     export GEM_GROUP=$(basename $(pwd))
 
     local new_gem_home=$GEM_GROUP_DIR/$GEM_GROUP
     local printable_gem_path=$(echo $GEM_PATH | sed 's/:/\\n\\t\\t/g')
 
-    changes="New $(hot_magenta \$GEM_HOME):\t$new_gem_home\n\n$(hot_magenta \$GEM_PATH):\t$printable_gem_path\n"
+    changes="New $(dull_red \$GEM_HOME):\t$new_gem_home\n\n$(dull_red \$GEM_PATH):\t$printable_gem_path\n"
 
     case "$1" in
         -h|--help)
@@ -230,7 +228,7 @@ function gg() {
         #     ;;
 
         remove)
-            echo "removing gem group $(hot_magenta $2)"
+            echo "removing gem group $(dull_red $2)"
             rm -rf $GEM_GROUP_DIR/$2
             ;;
 
@@ -258,55 +256,7 @@ function gg() {
     esac
 }
 
-# TODO consolidate these
-function find_gemfile() {
-    IN_RUBY_PROJECT=false
-    local dir="$PWD"
 
-    until [[ -z "$dir" ]]; do
-        if [[ -e "$dir/Gemfile" ]]; then
-            gem_group_name=$(basename $dir)
-            IN_RUBY_PROJECT=true
-            return
-        fi
-
-        dir="${dir%/*}"
-    done
-}
-
-function find_git_dir() {
-    IN_GIT_REPO=false
-    local dir="$PWD"
-
-    until [[ -z "$dir" ]]; do
-        if [[ -e "$dir/.git" ]]; then
-            IN_GIT_REPO=true
-            return
-        fi
-
-        dir="${dir%/*}"
-    done
-}
-
-function in_ruby_project() {
-    find_git_dir
-    find_gemfile
-    [[ $IN_GIT_REPO = true ]] && [[ $IN_RUBY_PROJECT = true ]]
-}
-
-# ruby environment
-function re() {
-    echo ''
-    echo "$(hot_magenta PATH:)"
-    show-path
-    echo ''
-    echo "$(hot_magenta GEM_PATH) \t=>\t$GEM_PATH"
-    echo "$(hot_magenta GEM_HOME) \t=>\t$GEM_HOME"
-    echo "$(hot_magenta GEM_ROOT) \t=>\t$GEM_ROOT"
-    echo "$(hot_magenta GEM_GROUP) \t=>\t$GEM_GROUP"
-    echo "$(hot_magenta RUBY_ENGINE) \t=>\t$RUBY_ENGINE"
-    echo "$(hot_magenta RUBY_ROOT) \t=>\t$RUBY_ROOT"
-}
 
 # gets executed whenever the pwd changes
 # can run a list of functions by making chpwd_functions array
@@ -438,7 +388,7 @@ function chruby_auto() {
             if [[ "$version" == "$RUBY_AUTO_VERSION" ]]; then return
             else
                 RUBY_AUTO_VERSION="$version"
-                echo "found ruby version $(hot_magenta $version)"
+                echo "found ruby version $(dull_red $version)"
                 chruby "$version"
                 return $?
             fi
