@@ -65,11 +65,11 @@ else
 fi
 
 ### Prompt ###
-function current_dir()    { echo "$(tput setab 8)[$(tput bold)$(hot_blue %~)$(tput setab 8)]$(tput sgr0)" }
+function current_dir()    { echo "[%{$fg_bold[blue]%}%~%{$reset_color%}]" }
 function current_branch() {
     if [[ -a .git/refs/heads ]] || [[ -a ../.git/refs/heads ]] || [[ -a ../../.git/refs/heads ]]; then
         ref=$($(which git) symbolic-ref HEAD 2> /dev/null) || return
-        echo "$(tput setab 8)[$(tput bold)$(hot_green ${ref#refs/heads/})$(tput setab 8)] $(tput sgr0)"
+        echo "[%{$fg_bold[green]%}${ref#refs/heads/}%{$reset_color%}] "
     else
         echo ""
     fi
