@@ -65,12 +65,11 @@ else
 fi
 
 ### Prompt ###
-function change_color()   { echo "%{$fg_bold[$1]%}$2%{$reset_color%}" }
-function current_dir()    { echo "[$(tput bold)$(hot_blue %~)]" }
+function current_dir()    { echo "$(tput setab 8)[$(tput bold)$(hot_blue %~)$(tput setab 8)]$(tput sgr0)" }
 function current_branch() {
     if [[ -a .git/refs/heads ]] || [[ -a ../.git/refs/heads ]] || [[ -a ../../.git/refs/heads ]]; then
         ref=$($(which git) symbolic-ref HEAD 2> /dev/null) || return
-        echo "[$(tput bold)$(hot_green ${ref#refs/heads/})] "
+        echo "$(tput setab 8)[$(tput bold)$(hot_green ${ref#refs/heads/})$(tput setab 8)] $(tput sgr0)"
     else
         echo ""
     fi
@@ -127,3 +126,5 @@ cat ~/.zshrc > ~/.loaded_zshrc
 
 ### set up session ###
 reset_paths
+# chruby
+# gg
