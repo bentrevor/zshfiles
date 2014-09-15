@@ -49,6 +49,7 @@ puts "export RUBY_VERSION=#{RUBY_VERSION};"
 begin; require 'rubygems'; puts "export GEM_ROOT=#{Gem.default_dir.inspect};"; rescue LoadError; end
 EOF
 )"
+    echo "using $(dull_red $(basename $1))\n"
 
     if (( $UID != 0 )); then
         export GEM_HOME="$HOME/.gem/$RUBY_ENGINE/$RUBY_VERSION"
@@ -89,8 +90,9 @@ function chruby()
             done
 
             if [[ -z "$match" ]]; then
-                local no_match="$1 is not installed"
-                echo "\n  $(dull_red $no_match)\n" >&2
+                local no_match="chruby could not find match for $(dull_red $1.)"
+                local still_using="still using $(dull_green "$(chruby | grep '^ \* ' | sed 's/ \* //')")"
+                echo "\n  $(hot_red $no_match)\n  ($still_using)\n" >&2
                 return 1
             fi
 
@@ -113,7 +115,7 @@ function chruby_auto() {
             if [[ "$version" == "$RUBY_AUTO_VERSION" ]]; then return
             else
                 RUBY_AUTO_VERSION="$version"
-                echo "found ruby version $(dull_red $version)"
+                echo "\$ chruby $(dull_red $version)"
                 chruby "$version"
                 return $?
             fi

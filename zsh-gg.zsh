@@ -126,10 +126,11 @@ function re() {
     echo "$(dull_red PATH:)"
     show-path
     echo ''
-    echo "$(dull_red GEM_PATH) \t=>\t$GEM_PATH"
     echo "$(dull_red GEM_HOME) \t=>\t$GEM_HOME"
     echo "$(dull_red GEM_ROOT) \t=>\t$GEM_ROOT"
+    echo "$(dull_red GEM_PATH) \t=>\t$GEM_PATH"
     echo "$(dull_red GEM_GROUP) \t=>\t$GEM_GROUP"
+    echo ''
     echo "$(dull_red RUBY_ENGINE) \t=>\t$RUBY_ENGINE"
     echo "$(dull_red RUBY_ROOT) \t=>\t$RUBY_ROOT"
 }
