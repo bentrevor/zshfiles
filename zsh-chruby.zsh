@@ -127,5 +127,3 @@ function chruby_auto() {
         unset RUBY_AUTO_VERSION
     fi
 }
-
-[[ ! "$preexec_functions" == *chruby_auto* ]] && preexec_functions+=("chruby_auto")

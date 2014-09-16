@@ -21,7 +21,9 @@ function gg() {
             ;;
 
         list|-l)
-            ls -l $GEM_GROUP_DIR
+            echo '  gem groups:'
+            ls -l $GEM_GROUP_DIR | sed 's/.* /    /' | tail -n +2
+            echo ''
             ;;
 
         # FIXME
@@ -61,8 +63,8 @@ function gg() {
 }
 
 function chpwd() {
-    # autoswitch_ruby
-    # autoswitch_gem_group
+    chruby_auto
+    # gg_auto
     # reset_paths
 
     # if in_ruby_project; then
@@ -118,7 +120,7 @@ function find_file_in_parent_dirs() {
 
 function find_gemfile()    { [[ $(find_file_in_parent_dirs 'Gemfile') = 'true' ]] }
 function find_git_dir()    { [[ $(find_file_in_parent_dirs '.git') = 'true' ]] }
-function in_ruby_project() { find_gemfile && find_git_dir && echo 'in ruby project' }
+function in_ruby_project() { find_gemfile && find_git_dir }
 
 # ruby environment
 function re() {

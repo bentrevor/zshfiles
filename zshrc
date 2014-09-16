@@ -91,5 +91,5 @@ cat ~/.zshrc > ~/.loaded_zshrc
 
 ### set up session ###
 reset_paths
-# chruby
+cd .
 # gg
