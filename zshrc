@@ -92,5 +92,4 @@ function show-bold-colors() { source ~/junk_drawer/scripts/color_functions.sh --
 cat ~/.zshrc > ~/.loaded_zshrc
 
 ### set up session ###
-reset_paths
 cd .

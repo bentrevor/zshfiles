@@ -1,95 +1,84 @@
-export GEM_GROUP_AUTOSWITCH=true
 export GEM_GROUP_DIR=~/.gem/groups
 mkdir -p $GEM_GROUP_DIR
 
 ### Gem Groups ###
 function gg() {
-    export GEM_GROUP=$(basename $(pwd))
-
-    local new_gem_home=$GEM_GROUP_DIR/$GEM_GROUP
-    local printable_gem_path=$(echo $GEM_PATH | sed 's/:/\\n\\t\\t/g')
-
-    changes="New $(dull_red \$GEM_HOME):\t$new_gem_home\n\n$(dull_red \$GEM_PATH):\t$printable_gem_path\n"
+    local new_gem_group=$(basename $(pwd))
+    local new_gem_home=$GEM_GROUP_DIR/$new_gem_group
 
     case "$1" in
-        -h|--help)
-            echo "Usage: TODO"
+        help | -h | --help)
+            echo "Usage:"
+            echo "\tlist\t\tlist all gem groups"
+            echo "\tremove\tremove gem group"
+            echo "\tdir\t\tshow $GEM_GROUP_DIR"
+            echo "\treset\t\tuse null gem group"
             ;;
 
-        --dry-run)
-            echo $changes
-            ;;
-
-        list|-l)
-            echo '  gem groups:'
+        list | -l)
+            echo '\n  gem groups:'
             ls -l $GEM_GROUP_DIR | sed 's/.* /    /' | tail -n +2
             echo ''
             ;;
 
-        # FIXME
-        # reset)
-        #     export PATH=$DEFAULT_PATH
-        #     export GEM_HOME=$DEFAULT_GEM_HOME
-        #     export GEM_PATH=$DEFAULT_GEM_PATH
-        #     ;;
+        reset)
+            unset GEM_GROUP
+            set_ruby_env
+            ;;
 
         remove)
-            echo "removing gem group $(dull_red $2)"
-            rm -rf $GEM_GROUP_DIR/$2
+            current=$(basename $(pwd))
+            rm -rf $GEM_GROUP_DIR/$current
+            echo "removed gem group $(dull_red $current)"
             ;;
 
         dir)
             echo $GEM_GROUP_DIR
             ;;
 
-        # FIXME
-        # use)
-        #     echo "using gem group $(hot_green $2)"
-        #     gg $2
-        #     ;;
-
-        *)
-
-            ;;
         "")
             if ! in_ruby_project; then
                 echo 'must be in ruby project'
             else
-                mkdir -p ${new_gem_home}
-                export GEM_HOME=${new_gem_home}
+                if [ ! -d $new_gem_home ]; then
+                    echo "creating new gem group $(dull_red $new_gem_group)"
+                    mkdir -p ${new_gem_home}
+                fi
 
-                echo $changes
+                export GEM_HOME=${new_gem_home}
+                export GEM_GROUP=${new_gem_group}
+
+                echo "now using gem group $(dull_red $GEM_GROUP)"
             fi
             ;;
     esac
 }
 
 function gg_auto() {
-    gg $(basename $(pwd))
-}
-
-function chpwd() {
-    chruby_auto
-    # gg_auto
-}
-
-### Helper functions ###
-function set_gem_group() {
     if in_ruby_project; then
-        export GEM_GROUP=$(basename $(pwd))
+        echo "\$ gg"
+        gg
     else
-        unset GEM_GROUP
+        echo "\$ gg reset"
+        gg reset
     fi
 }
 
-function reset_paths() {
-    set_gem_path
+export GEM_GROUP_AUTOSWITCH=true
+
+function chpwd() {
+    chruby_auto
+    [ $GEM_GROUP_AUTOSWITCH = true ] && gg_auto
+    set_ruby_env
+}
+
+### Helper functions ###
+function set_ruby_env() {
     set_gem_home
+    set_gem_path
 
     export PATH=$(gem_bins):$(ruby_bins):$(global_bins)
 }
-
-function set_gem_path()  { export GEM_PATH=$RUBY_ROOT }
 
 function set_gem_home() {
     if [[ -n $GEM_GROUP ]]; then
@@ -98,6 +87,8 @@ function set_gem_home() {
         export GEM_HOME=$RUBY_ROOT
     fi
 }
+
+function set_gem_path()  { export GEM_PATH=$RUBY_ROOT }
 
 function global_bins() { echo '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin' }
 function ruby_bins()   { echo "$RUBY_ROOT/bin" }
