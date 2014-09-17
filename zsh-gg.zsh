@@ -35,7 +35,7 @@ function gg() {
             local new_gem_home=$(gem_group_dir)/$new_gem_group
 
             if [ ! -d $new_gem_home ]; then
-                echo "creating gem group $(dull_red $GEM_GROUP)"
+                echo "creating gem group $(dull_red $new_gem_group)"
                 mkdir -p ${new_gem_home}
             fi
 
