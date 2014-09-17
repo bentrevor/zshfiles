@@ -10,15 +10,6 @@ platform='unknown'
 function linux() { [[ $platform == 'linux' ]] }
 function osx()   { [[ $platform == 'osx' ]]   }
 
-setopt LOCAL_OPTIONS # allow functions to have local options
-setopt LOCAL_TRAPS   # allow functions to have local traps
-setopt PROMPT_SUBST
-setopt AUTO_CD
-stty -ixon -ixoff    # disable scroll lock
-export EDITOR=vim
-set -o emacs
-for config_file ($HOME/.zsh/*.zsh(.N)) source $config_file # Load other config files
-
 ### Completion ###
 fpath=(~/.zsh/completion $fpath) # add custom completion to fpath
 setopt COMPLETE_IN_WORD
@@ -45,6 +36,8 @@ setopt SHARE_HISTORY        # share across sessions
 setopt HIST_IGNORE_ALL_DUPS # don't record dupes in history
 setopt HIST_IGNORE_DUPS
 setopt HIST_REDUCE_BLANKS
+
+### more ZSH settings ###
 unsetopt correct_all
 bindkey -e                                       # use emacs key bindings
 bindkey '^r' history-incremental-search-backward # make Control-r work
@@ -53,6 +46,15 @@ bindkey "^[[3~" delete-char                      # make delete key work
 bindkey "^[3;5~" delete-char                     # make delete key work
 autoload -U select-word-style
 select-word-style bash
+
+setopt LOCAL_OPTIONS # allow functions to have local options
+setopt LOCAL_TRAPS   # allow functions to have local traps
+setopt PROMPT_SUBST
+setopt AUTO_CD
+stty -ixon -ixoff    # disable scroll lock
+export EDITOR=vim
+set -o emacs
+for config_file ($HOME/.zsh/*.zsh(.N)) source $config_file # Load other config files
 
 ### OS-specific settings ###
 if linux; then
@@ -92,4 +94,3 @@ cat ~/.zshrc > ~/.loaded_zshrc
 ### set up session ###
 reset_paths
 cd .
-# gg

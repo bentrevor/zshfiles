@@ -48,7 +48,9 @@ function gg() {
         #     gg $2
         #     ;;
 
-        # use the current directory name by default
+        *)
+
+            ;;
         "")
             if ! in_ruby_project; then
                 echo 'must be in ruby project'
@@ -62,14 +64,13 @@ function gg() {
     esac
 }
 
+function gg_auto() {
+    gg $(basename $(pwd))
+}
+
 function chpwd() {
     chruby_auto
     # gg_auto
-    # reset_paths
-
-    # if in_ruby_project; then
-    #     echo 'in a ruby project'
-    # fi
 }
 
 ### Helper functions ###
