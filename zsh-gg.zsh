@@ -70,7 +70,12 @@ function gem_group_dir() {
 
 export GEM_GROUP_AUTOSWITCH=true
 
+function bundle_config_warning() {
+    [ $(pwd) != $HOME ] && [ -d ./.bundle ] && echo "\n  $(dull_red 'WARNING: there is a project-specific bundler configuration\n  in .bundle, and it is probably going to screw shit up')\n"
+}
+
 function chpwd() {
+    bundle_config_warning
     chruby_auto
     [ $GEM_GROUP_AUTOSWITCH = true ] && gg_auto
     set_ruby_env
