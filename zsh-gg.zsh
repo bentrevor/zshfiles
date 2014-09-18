@@ -11,7 +11,7 @@ function gg() {
             ;;
 
         list | -l)
-            echo "\n  gem groups for $RUBY_ENGINE-$RUBY_VERSION:"
+            echo "\n  gem groups for $(basename $RUBY_ROOT):"
             ls -l "$(gem_group_dir)" | sed 's/.* /    /' | tail -n +2
             echo ''
             ;;
@@ -40,18 +40,22 @@ function gg() {
             ;;
 
         "")
-            local new_gem_group=$(basename $(pwd))
-            local new_gem_home=$(gem_group_dir)/$new_gem_group
+            if [[ -e ./Gemfile ]] && [[ -d ./.git ]]; then
+                local new_gem_group=$(basename $(pwd))
+                local new_gem_home=$(gem_group_dir)/$new_gem_group
 
-            if [ ! -d $new_gem_home ]; then
-                echo "creating gem group $(dull_red $new_gem_group)"
-                mkdir -p ${new_gem_home}
+                if [ ! -d $new_gem_home ]; then
+                    echo "creating gem group $(dull_red $new_gem_group)"
+                    mkdir -p ${new_gem_home}
+                fi
+
+                export GEM_HOME=${new_gem_home}
+                export GEM_GROUP=${new_gem_group}
+
+                echo "now using gem group $(dull_red $GEM_GROUP)"
+            else
+                echo "$(dull_red 'must be in root dir of ruby project')"
             fi
-
-            export GEM_HOME=${new_gem_home}
-            export GEM_GROUP=${new_gem_group}
-
-            echo "now using gem group $(dull_red $GEM_GROUP)"
             ;;
     esac
 }
@@ -74,7 +78,7 @@ function gg_auto() {
 }
 
 function gem_group_dir() {
-    echo "/Users/ben/.gem/$RUBY_ENGINE/$RUBY_VERSION/groups"
+    echo "/Users/ben/.gem/$(current_ruby)/groups"
 }
 
 export GEM_GROUP_AUTOSWITCH=true
@@ -91,6 +95,11 @@ function chpwd() {
 }
 
 ### Helper functions ###
+
+function current_ruby() {
+    echo $(basename $RUBY_ROOT)
+}
+
 function set_ruby_env() {
     set_gem_home
     set_gem_path
