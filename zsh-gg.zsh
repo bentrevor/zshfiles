@@ -94,8 +94,10 @@ function bundle_config_warning() {
 function chpwd() {
     bundle_config_warning
     chruby_auto
-    [ $GEM_GROUP_AUTOSWITCH = true ] && gg_auto
-    set_ruby_env
+    [[ $GEM_GROUP_AUTOSWITCH = true ]] && gg_auto
+    # rubinius needs some dir on GEM_PATH to load rubysl gems
+    # I might not need this set_ruby_env at all
+    [[  $RUBY_ENGINE != 'rbx' ]] && set_ruby_env
 }
 
 ### Helper functions ###
