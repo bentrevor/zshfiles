@@ -11,9 +11,13 @@ function gg() {
             ;;
 
         list | -l)
-            echo "\n  gem groups for $(basename $RUBY_ROOT):"
-            ls -l "$(gem_group_dir)" | sed 's/.* /    /' | tail -n +2
-            echo ''
+            if [ -d $(gem_group_dir) ]; then
+                echo "\n  gem groups for $(current_ruby):"
+                ls -l "$(gem_group_dir)" | sed 's/.* /    /' | tail -n +2
+                echo ''
+            else
+                echo "\n  no gem groups exist for $(current_ruby)\n"
+            fi
             ;;
 
         reset)
