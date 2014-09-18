@@ -7,6 +7,7 @@ function gg() {
             echo "\tremove\tremove gem group"
             echo "\tdir\t\tshow $GEM_GROUP_DIR"
             echo "\treset\t\tuse null gem group"
+            echo "\tcd\t\tchange to gem group dir"
             ;;
 
         list | -l)
@@ -28,6 +29,14 @@ function gg() {
 
         dir)
             echo $(gem_group_dir)
+            ;;
+
+        cd)
+            # don't want to autoswitch gg
+            old_gga=$GEM_GROUP_AUTOSWITCH
+            GEM_GROUP_AUTOSWITCH=false
+            cd $(gem_group_dir)/$GEM_GROUP/gems
+            GEM_GROUP_AUTOSWITCH=$old_gga
             ;;
 
         "")
