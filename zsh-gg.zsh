@@ -58,7 +58,7 @@ function gg_auto() {
             echo "\$ gg"
             gg
         fi
-    else
+    elif [[ -n $GEM_GROUP ]]; then
         echo "\$ gg reset"
         gg reset
     fi
