@@ -67,6 +67,12 @@ function chruby()
         -V|--version)
             echo "chruby: $CHRUBY_VERSION"
             ;;
+        on)
+            CHRUBY_AUTOSWITCH=true;
+            ;;
+        off)
+            CHRUBY_AUTOSWITCH=false;
+            ;;
         "")
             local dir star
             for dir in "${RUBIES[@]}"; do
@@ -104,6 +110,7 @@ function chruby()
 
 # auto.sh
 unset RUBY_AUTO_VERSION
+export CHRUBY_AUTOSWITCH=true
 
 function chruby_auto() {
     local dir="$PWD/" version

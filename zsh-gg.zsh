@@ -43,6 +43,14 @@ function gg() {
             GEM_GROUP_AUTOSWITCH=$old_gga
             ;;
 
+        on)
+            GEM_GROUP_AUTOSWITCH=true
+            ;;
+
+        off)
+            GEM_GROUP_AUTOSWITCH=false
+            ;;
+
         "")
             if [[ -e ./Gemfile ]] && [[ -d ./.git ]]; then
                 local new_gem_group=$(basename $(pwd))
@@ -61,6 +69,10 @@ function gg() {
                 echo "$(dull_red 'must be in root dir of ruby project')"
             fi
             ;;
+
+        *)
+            echo "unknown option $(dull_red $1)"
+            ;;
     esac
 }
 
@@ -71,6 +83,9 @@ function gg_auto() {
 
         if [ ! -d $new_gem_home ]; then
             echo "create gem group $(dull_red $new_gem_group) by running $(tput bold)$(hot_white 'gg')$(tput sgr0)"
+            # don't want to still use previous group
+            echo "\$ gg reset"
+            gg reset
         else
             echo "\$ gg"
             gg
@@ -93,7 +108,7 @@ function bundle_config_warning() {
 
 function chpwd() {
     bundle_config_warning
-    chruby_auto
+    [[ $CHRUBY_AUTOSWITCH    = true ]] && chruby_auto
     [[ $GEM_GROUP_AUTOSWITCH = true ]] && gg_auto
     # rubinius needs some dir on GEM_PATH to load rubysl gems
     # I might not need this set_ruby_env at all
