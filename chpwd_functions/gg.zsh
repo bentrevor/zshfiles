@@ -1,3 +1,5 @@
+export GEM_GROUP_AUTOSWITCH=true
+
 ### Gem Groups ###
 function gg() {
     case "$1" in
@@ -100,23 +102,11 @@ function gem_group_dir() {
     echo "/Users/ben/.gem/$(current_ruby)/groups"
 }
 
-export GEM_GROUP_AUTOSWITCH=true
-
 function bundle_config_warning() {
     [ $(pwd) != $HOME ] && [ -d ./.bundle ] && echo "\n  $(dull_red 'WARNING: there is a project-specific bundler configuration\n  in .bundle, and it is probably going to screw shit up')\n"
 }
 
-function chpwd() {
-    bundle_config_warning
-    [[ $CHRUBY_AUTOSWITCH    = true ]] && chruby_auto
-    [[ $GEM_GROUP_AUTOSWITCH = true ]] && gg_auto
-    # rubinius needs some dir on GEM_PATH to load rubysl gems
-    # I might not need this set_ruby_env at all
-    [[  $RUBY_ENGINE != 'rbx' ]] && set_ruby_env
-}
-
 ### Helper functions ###
-
 function current_ruby() {
     echo $(basename $RUBY_ROOT)
 }

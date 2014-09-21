@@ -54,7 +54,19 @@ setopt AUTO_CD
 stty -ixon -ixoff    # disable scroll lock
 export EDITOR=vim
 set -o emacs
-for config_file ($HOME/.zsh/*.zsh(.N)) source $config_file # Load other config files
+
+source $HOME/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+for config_file ($HOME/.zsh/chpwd_functions/*.zsh) source $config_file
+function chpwd() {
+    bundle_config_warning
+    [[ $CHRUBY_AUTOSWITCH    = true ]] && chruby_auto
+    [[ $GEM_GROUP_AUTOSWITCH = true ]] && gg_auto
+    # rubinius needs some dir on GEM_PATH to load rubysl gems
+    # I might not need this set_ruby_env at all
+    [[  $RUBY_ENGINE != 'rbx' ]] && set_ruby_env
+    prune_z
+}
 
 ### OS-specific settings ###
 if linux; then
@@ -65,6 +77,42 @@ else
     source $(brew --prefix)/etc/profile.d/z.sh
     source ~/.zsh/export_homebrew_github_api_token.sh
 fi
+
+### Aliases ###
+alias l='ls -lhpG'
+alias lsa='ls -lhpA'
+
+alias e='emacs'
+
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
+
+alias t='tree -C --dirsfirst'
+alias t2='tree -C --dirsfirst -L 2'
+
+# make aliases work with "sudo"
+alias sudo='sudo '
+
+# let tmux use 256 colors
+alias tmux='tmux -2'
+
+alias be='bundle exec'
+
+alias gl="git log --graph --date=short --format=format:'%C(blue)%h%C(white) %C(240)- %C(white)%s%C(240) -- %an, %ad'"
+alias gd='git diff'
+alias gs='git status'
+alias gb='git branch'
+
+alias pgstart="pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server.log start"
+alias pgstop="pg_ctl -D /usr/local/bin/postgres stop -s -m fast"
+alias pryr="pry -r ./config/environment -r rails/console/app -r rails/console/helpers"
+alias enova="cd ~/8b/brands/netcredit"
+
+alias scm='scheme-r5rs'
+alias wget_mirror='wget --mirror -p --html-extension --convert-links'
+alias df='df -h' # human-readable output
+
 
 ### Prompt ###
 function current_dir()    { echo "[%{$fg_bold[blue]%}%~%{$reset_color%}]" }
