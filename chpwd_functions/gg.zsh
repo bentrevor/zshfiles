@@ -126,11 +126,11 @@ function set_gem_home() {
     fi
 }
 
-function set_gem_path()  { export GEM_PATH=$RUBY_ROOT }
+function set_gem_path() { export GEM_PATH=$RUBY_ROOT:$GEM_ROOT:$GEM_HOME }
 
-function global_bins() { echo '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin' }
-function ruby_bins()   { echo "$RUBY_ROOT/bin" }
-function gem_bins()    { echo "$GEM_HOME/bin" }
+function global_bins()  { echo '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin' }
+function ruby_bins()    { echo "$RUBY_ROOT/bin" }
+function gem_bins()     { echo "$GEM_HOME/bin" }
 
 
 function find_file_in_parent_dirs() {
