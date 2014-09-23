@@ -23,7 +23,7 @@ zstyle ':completion:*:default' menu 'select=0'      # menu-style
 export CLICOLOR=1
 autoload colors
 colors
-source ~/junk_drawer/scripts/color_functions.sh # Color helper functions
+[[ -d ~/junk_drawer ]] && source ~/junk_drawer/scripts/color_functions.sh # Color helper functions
 
 ### History ###
 export HISTFILE=$HOME/.zsh_history
@@ -65,7 +65,7 @@ function chpwd() {
     # rubinius needs some dir on GEM_PATH to load rubysl gems
     # I might not need this set_ruby_env at all
     set_ruby_env
-    prune_z
+    [[ -e ~/.z ]] && prune_z
 }
 
 ### OS-specific settings ###
