@@ -59,19 +59,25 @@ source $HOME/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 for config_file ($HOME/.zsh/chpwd_functions/*.zsh) source $config_file
 function chpwd() {
-    bundle_config_warning
-    [[ $CHRUBY_AUTOSWITCH    = true ]] && chruby_auto
-    [[ $GEM_GROUP_AUTOSWITCH = true ]] && gg_auto
-    # rubinius needs some dir on GEM_PATH to load rubysl gems
-    # I might not need this set_ruby_env at all
-    set_ruby_env
-    [[ -e ~/.z ]] && prune_z
+    if osx; then
+        bundle_config_warning
+        [[ $CHRUBY_AUTOSWITCH    = true ]] && chruby_auto
+        [[ $GEM_GROUP_AUTOSWITCH = true ]] && gg_auto
+        # rubinius needs some dir on GEM_PATH to load rubysl gems
+        # I might not need this set_ruby_env at all
+        set_ruby_env
+        [[ -e ~/.z ]] && prune_z
+    fi
 }
 
 ### OS-specific settings ###
 if linux; then
+    prompt_branch_color='yellow'
+    prompt_path_color='red'
     alias ls='ls --color'
 else
+    prompt_branch_color='green'
+    prompt_path_color='blue'
     alias ls='ls -G'
 
     source $(brew --prefix)/etc/profile.d/z.sh
@@ -115,11 +121,11 @@ alias df='df -h' # human-readable output
 
 
 ### Prompt ###
-function current_dir()    { echo "[%{$fg_bold[blue]%}%~%{$reset_color%}]" }
+function current_dir()    { echo "[%{$fg_bold[$prompt_path_color]%}%~%{$reset_color%}]" }
 function current_branch() {
     if [[ -a .git/refs/heads ]] || [[ -a ../.git/refs/heads ]] || [[ -a ../../.git/refs/heads ]]; then
         ref=$($(which git) symbolic-ref HEAD 2> /dev/null) || return
-        echo "[%{$fg_bold[green]%}${ref#refs/heads/}%{$reset_color%}] "
+        echo "[%{$fg_bold[$prompt_branch_color]%}${ref#refs/heads/}%{$reset_color%}] "
     else
         echo ""
     fi
