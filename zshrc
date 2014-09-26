@@ -60,12 +60,7 @@ source $HOME/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 for config_file ($HOME/.zsh/chpwd_functions/*.zsh) source $config_file
 function chpwd() {
     if osx; then
-        bundle_config_warning
-        [[ $CHRUBY_AUTOSWITCH    = true ]] && chruby_auto
-        [[ $GEM_GROUP_AUTOSWITCH = true ]] && gg_auto
-        # rubinius needs some dir on GEM_PATH to load rubysl gems
-        # I might not need this set_ruby_env at all
-        set_ruby_env
+        [[ $CHRUBY_AUTOSWITCH = true ]] && chruby_auto
         [[ -e ~/.z ]] && prune_z
     fi
 }
@@ -94,8 +89,8 @@ alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 
-alias t='tree -C --dirsfirst'
-alias t2='tree -C --dirsfirst -L 2'
+alias t='tree -C --dirsfirst -I coverage '
+alias t2='t -L 2'
 
 # make aliases work with "sudo"
 alias sudo='sudo '
@@ -146,4 +141,9 @@ function show-bold-colors() { source ~/junk_drawer/scripts/color_functions.sh --
 cat ~/.zshrc > ~/.loaded_zshrc
 
 ### set up session ###
-cd .
+function global_bins()  { echo '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin' }
+function haskell_bins() { echo "$HOME/Library/Haskell/bin" }
+function gem_bins()     { echo "$GEM_HOME/bin" }
+
+export PATH=$(haskell_bins):$(gem_bins):$(global_bins)
+chpwd
