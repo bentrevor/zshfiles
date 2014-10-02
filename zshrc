@@ -57,13 +57,21 @@ set -o emacs
 
 source $HOME/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
-for config_file ($HOME/.zsh/chpwd_functions/*.zsh) source $config_file
 function chpwd() {
     if osx; then
         [[ $CHRUBY_AUTOSWITCH = true ]] && chruby_auto
         [[ -e ~/.z ]] && prune_z
     fi
 }
+
+function log_commands() {
+    [[ $(cat ~/.full_history | wc -l) -gt 20000 ]] && echo "~/.full_history is getting pretty big..."
+    echo "$(date '+%d/%m/%Y\t%H:%M')\t$(pwd)\t$1" >> ~/.full_history
+}
+
+if [[ ! "$preexec_functions" == *log_commands* ]]; then
+    preexec_functions+=("log_commands")
+fi
 
 ### OS-specific settings ###
 if linux; then
@@ -137,6 +145,21 @@ function show-path()        { echo $PATH | tr ':' '\n' }
 function show-colors()      { source ~/junk_drawer/scripts/color_functions.sh --debug }
 function show-bold-colors() { source ~/junk_drawer/scripts/color_functions.sh --bold }
 
+# ruby environment
+function re() {
+    echo ''
+    echo "$(dull_red PATH:)"
+    show-path
+    echo ''
+    echo "$(dull_red GEM_HOME) \t=>\t$GEM_HOME"
+    echo "$(dull_red GEM_ROOT) \t=>\t$GEM_ROOT"
+    echo "$(dull_red GEM_PATH) \t=>\t$GEM_PATH"
+    echo "$(dull_red GEM_GROUP) \t=>\t$GEM_GROUP"
+    echo ''
+    echo "$(dull_red RUBY_ENGINE) \t=>\t$RUBY_ENGINE"
+    echo "$(dull_red RUBY_ROOT) \t=>\t$RUBY_ROOT"
+}
+
 # for debugging
 cat ~/.zshrc > ~/.loaded_zshrc
 
@@ -144,6 +167,7 @@ cat ~/.zshrc > ~/.loaded_zshrc
 function global_bins()  { echo '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin' }
 function haskell_bins() { echo "$HOME/Library/Haskell/bin" }
 function gem_bins()     { echo "$GEM_HOME/bin" }
+function 8br_bins()     { echo "$HOME/work/enova/8b/bin" }
 
-export PATH=$(haskell_bins):$(gem_bins):$(global_bins)
+export PATH=$(8br_bins):$(haskell_bins):$(gem_bins):$(global_bins)
 chpwd
