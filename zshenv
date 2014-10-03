@@ -1,1 +1,1 @@
-for config_file ($HOME/.zsh/functions/*.zsh) source $config_file
+for config_file ($HOME/.zsh/zshenv_scripts/*.zsh) source $config_file
