@@ -65,9 +65,18 @@ function chpwd() {
     fi
 }
 
+export COMMAND_LOGGING=true
+
+function dont_log_that() {
+    local ocl=$COMMAND_LOGGING
+    export COMMAND_LOGGING=false
+    echo -e '$d\n$d\nwq' | ed ~/.full_history # deletes last two lines ( one is `export COMMAND_LOGGING=false`)
+    export COMMAND_LOGGING=$ocl
+}
+
 function log_commands() {
-    [[ $(cat ~/.full_history | wc -l) -gt 20000 ]] && echo "~/.full_history is getting pretty big..."
-    echo "$(date '+%d/%m/%Y\t%H:%M')\t$(pwd)\t$1" >> ~/.full_history
+    [[ $(cat ~/.full_history | wc -l) -gt 5000 ]] && echo "~/.full_history is getting pretty big..."
+    [[ $COMMAND_LOGGING = true ]] && echo "$(date '+%d/%m/%Y\t%H:%M')\t$(pwd)\t$1" >> ~/.full_history
 }
 
 if [[ ! "$preexec_functions" == *log_commands* ]]; then
