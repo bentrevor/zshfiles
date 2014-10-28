@@ -61,7 +61,6 @@ source $HOME/.zsh/zshenv_scripts/aliases.zsh
 function chpwd() {
     if osx; then
         [[ $CHRUBY_AUTOSWITCH = true ]] && chruby_auto
-        [[ -e ~/.z ]] && prune_z
     fi
 }
 
@@ -94,16 +93,27 @@ else
     alias ls='ls -G'
 
     source $(brew --prefix)/etc/profile.d/z.sh
+    _Z_EXCLUDE_DIRS=("$HOME/.gem" "$HOME/.rubies" "$HOME/Library" "$HOME/work/enova/8b/gems/portfolio_client" "$HOME/work/enova/8b/gems/identity_client")
     source ~/.zsh/export_homebrew_github_api_token.sh
 fi
 
 
 ### Prompt ###
+# first line of `git status` is either `On branch xxx` or `HEAD detached at xxx`
+function nth_word_of_gs()       { git status | head -1 | awk "{print \$$1}" }
+function detached_head()        { [[ $(nth_word_of_gs 2) == 'detached' ]] }
+function detached_head_status() { nth_word_of_gs 4 }
+function attached_head_status() { nth_word_of_gs 3 }
+
 function current_dir()    { echo "[%{$fg_bold[$prompt_path_color]%}%~%{$reset_color%}]" }
 function current_branch() {
     if [[ -a .git/refs/heads ]] || [[ -a ../.git/refs/heads ]] || [[ -a ../../.git/refs/heads ]]; then
-        ref=$($(which git) symbolic-ref HEAD 2> /dev/null) || return
-        echo "[%{$fg_bold[$prompt_branch_color]%}${ref#refs/heads/}%{$reset_color%}] "
+        if detached_head; then
+            branch=$(detached_head_status)
+        else
+            branch=$(attached_head_status)
+        fi
+        echo "[%{$fg_bold[$prompt_branch_color]%}$branch%{$reset_color%}] "
     else
         echo ""
     fi
@@ -114,6 +124,10 @@ export PS1='$(current_branch)$(current_dir) '
 [[ -a ~/.vpn_functions ]] && source ~/.vpn_functions
 export FIX_VPN_POW=yes
 export FIX_VPN_MINIRAISER=yes
+
+function pgkill() {
+    echo "select pg_terminate_backend(pg_stat_activity.pid) from pg_stat_activity where pg_stat_activity.datname = 'netcredit_$(basename $(pwd))_development' and pid <> pg_backend_pid()" | be rails db
+}
 
 ### Helpers ###
 function show-path()        { echo $PATH | tr ':' '\n' }
@@ -133,6 +147,21 @@ function re() {
     echo ''
     echo "$(dull_red RUBY_ENGINE) \t=>\t$RUBY_ENGINE"
     echo "$(dull_red RUBY_ROOT) \t=>\t$RUBY_ROOT"
+}
+
+# for some reason, `be re` doesn't work
+function bere() {
+    echo ''
+    echo "$(dull_red PATH:)"
+    bundle exec echo $PATH | tr ':' '\n'
+    echo ''
+    bundle exec echo "$(dull_red GEM_HOME)      =>      $GEM_HOME"
+    bundle exec echo "$(dull_red GEM_ROOT)      =>      $GEM_ROOT"
+    bundle exec echo "$(dull_red GEM_PATH)      =>      $GEM_PATH"
+    bundle exec echo "$(dull_red GEM_GROUP)     =>      $GEM_GROUP"
+    bundle exec echo ''
+    bundle exec echo "$(dull_red RUBY_ENGINE)   =>      $RUBY_ENGINE"
+    bundle exec echo "$(dull_red RUBY_ROOT)     =>      $RUBY_ROOT"
 }
 
 # for debugging

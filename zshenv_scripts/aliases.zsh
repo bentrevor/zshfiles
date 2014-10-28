@@ -14,6 +14,9 @@ alias t2='t -L 2'
 # make aliases work with "sudo"
 alias sudo='sudo '
 
+# escape square brackets
+alias ng='noglob '
+
 # let tmux use 256 colors
 alias tmux='tmux -2'
 
