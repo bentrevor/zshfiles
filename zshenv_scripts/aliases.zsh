@@ -35,3 +35,15 @@ alias enova="cd ~/8b/brands/netcredit"
 alias scm='scheme-r5rs'
 alias wget_mirror='wget --mirror -p --html-extension --convert-links'
 alias df='df -h' # human-readable output
+
+function alert() {
+    msg=''
+
+    if [[ $? == 0 ]]; then
+        msg='great job!'
+    else
+        msg='no!'
+    fi
+
+    osascript -e "tell app \"System Events\" to display dialog \"$msg\""
+}
