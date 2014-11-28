@@ -172,6 +172,9 @@ function global_bins()  { echo '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/s
 function haskell_bins() { echo "$HOME/Library/Haskell/bin" }
 function gem_bins()     { echo "$GEM_HOME/bin" }
 function 8br_bins()     { echo "$HOME/work/enova/8b/bin" }
+function nim_bins()     { echo "$HOME/work/nimrod/bin" }
+function go_bins()      { echo "$GOPATH/bin" }
 
-export PATH=$(8br_bins):$(haskell_bins):$(gem_bins):$(global_bins)
+export GOPATH=$HOME/go
+export PATH=$(8br_bins):$(haskell_bins):$(nim_bins):$(go_bins):$(gem_bins):$(global_bins)
 chpwd
