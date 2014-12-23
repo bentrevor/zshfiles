@@ -26,6 +26,7 @@ alias gl="git log --graph --date=short --format=format:'%C(blue)%h%C(white) %C(2
 alias gd='git diff'
 alias gs='git status'
 alias gb='git branch'
+alias gamend='git add . && git commit --amend'
 
 alias pgstart="pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server.log start"
 alias pgstop="pg_ctl -D /usr/local/bin/postgres stop -s -m fast"

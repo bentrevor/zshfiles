@@ -74,7 +74,11 @@ function dont_log_that() {
 }
 
 function log_commands() {
-    [[ $(cat ~/.full_history | wc -l) -gt 5000 ]] && echo "~/.full_history is getting pretty big..."
+    if [[ $(cat ~/.full_history | wc -l) -gt 5000 ]]; then
+        echo 'logging ~/.full_history'
+        mv ~/.full_history $(date +%Y_%m_%d)
+        touch ~/.full_history
+    fi
     [[ $COMMAND_LOGGING = true ]] && echo "$(date '+%d/%m/%Y\t%H:%M')\t$(pwd)\t$1" >> ~/.full_history
 }
 
@@ -153,15 +157,14 @@ function re() {
 function bere() {
     echo ''
     echo "$(dull_red PATH:)"
-    bundle exec echo $PATH | tr ':' '\n'
-    echo ''
-    bundle exec echo "$(dull_red GEM_HOME)      =>      $GEM_HOME"
-    bundle exec echo "$(dull_red GEM_ROOT)      =>      $GEM_ROOT"
-    bundle exec echo "$(dull_red GEM_PATH)      =>      $GEM_PATH"
-    bundle exec echo "$(dull_red GEM_GROUP)     =>      $GEM_GROUP"
-    bundle exec echo ''
-    bundle exec echo "$(dull_red RUBY_ENGINE)   =>      $RUBY_ENGINE"
-    bundle exec echo "$(dull_red RUBY_ROOT)     =>      $RUBY_ROOT"
+    bundle exec echo "$(echo $PATH | tr ':' '\n')
+        $(dull_red GEM_HOME)      =>      $GEM_HOME
+        $(dull_red GEM_ROOT)      =>      $GEM_ROOT
+        $(dull_red GEM_PATH)      =>      $GEM_PATH
+        $(dull_red GEM_GROUP)     =>      $GEM_GROUP
+
+        $(dull_red RUBY_ENGINE)   =>      $RUBY_ENGINE
+        $(dull_red RUBY_ROOT)     =>      $RUBY_ROOT"
 }
 
 # for debugging
