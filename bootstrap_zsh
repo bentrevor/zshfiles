@@ -24,10 +24,11 @@ def install_syntax_highlighting(bundles)
   end
 end
 
-def link_zshrc
-  `ln -s ~/.zsh/.zshrc ~/.zshrc`
+def link_zshrc_and_zshenv
+  `ln -s ~/.zsh/zshrc ~/.zshrc`
+  `ln -s ~/.zsh/zshenv ~/.zshenv`
 end
 
-link_zshrc
+link_zshrc_and_zshenv
 install_syntax_highlighting git_bundles
 

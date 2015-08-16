@@ -47,6 +47,15 @@ bindkey "^[3;5~" delete-char                     # make delete key work
 autoload -U select-word-style
 select-word-style bash
 
+# function my-move-cursor() {
+#     spacesToNextWord=5
+#     echo -en "\033[${spacesToNextWord}C"
+# }
+
+# zle -N my-move-cursor
+# bindkey "^[w" my-move-cursor                     # make delete key work
+
+
 setopt LOCAL_OPTIONS # allow functions to have local options
 setopt LOCAL_TRAPS   # allow functions to have local traps
 setopt PROMPT_SUBST
@@ -74,12 +83,12 @@ function dont_log_that() {
 }
 
 function log_commands() {
-    if [[ $(cat ~/.full_history | wc -l) -gt 5000 ]]; then
+    if [[ $(cat ~/.full_history | wc -l) -gt 3000 ]]; then
         echo 'logging ~/.full_history'
-        mv ~/.full_history $(date +%Y_%m_%d)
+        mv ~/.full_history ~/terminal_histories/$(date +%Y_%m_%d)
         touch ~/.full_history
     fi
-    [[ $COMMAND_LOGGING = true ]] && echo "$(date '+%d/%m/%Y\t%H:%M')\t$(pwd)\t$1" >> ~/.full_history
+    [[ $COMMAND_LOGGING = true ]] && echo "$(date '+%Y-%m-%d\t%H:%M')\t$(pwd)\t$1" >> ~/.full_history
 }
 
 if [[ ! "$preexec_functions" == *log_commands* ]]; then
@@ -98,7 +107,7 @@ else
 
     source $(brew --prefix)/etc/profile.d/z.sh
     _Z_EXCLUDE_DIRS=("$HOME/.gem" "$HOME/.rubies" "$HOME/Library" "$HOME/work/enova/8b/gems/portfolio_client" "$HOME/work/enova/8b/gems/identity_client")
-    source ~/.zsh/export_homebrew_github_api_token.sh
+    # source ~/.zsh/export_homebrew_github_api_token.sh
 fi
 
 
@@ -123,15 +132,6 @@ function current_branch() {
     fi
 }
 export PS1='$(current_branch)$(current_dir) '
-
-### Enova ###
-[[ -a ~/.vpn_functions ]] && source ~/.vpn_functions
-export FIX_VPN_POW=yes
-export FIX_VPN_MINIRAISER=yes
-
-function pgkill() {
-    echo "select pg_terminate_backend(pg_stat_activity.pid) from pg_stat_activity where pg_stat_activity.datname = 'netcredit_$(basename $(pwd))_development' and pid <> pg_backend_pid()" | be rails db
-}
 
 ### Helpers ###
 function show-path()        { echo $PATH | tr ':' '\n' }
@@ -167,17 +167,37 @@ function bere() {
         $(dull_red RUBY_ROOT)     =>      $RUBY_ROOT"
 }
 
+# add WTFPL license
+function wtfpl() {
+    if [ -f LICENSE ]; then
+        echo 'LICENSE file already exists'
+    else
+        cat > LICENSE <<- EOM
+        DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE 
+                    Version 2, December 2004 
+
+ Copyright (C) 2004 Sam Hocevar <sam@hocevar.net> 
+
+ Everyone is permitted to copy and distribute verbatim or modified 
+ copies of this license document, and changing it is allowed as long 
+ as the name is changed. 
+
+            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE 
+   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION 
+
+  0. You just DO WHAT THE FUCK YOU WANT TO.
+EOM
+    fi  
+}
+
 # for debugging
 cat ~/.zshrc > ~/.loaded_zshrc
 
 ### set up session ###
 function global_bins()  { echo '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin' }
-function haskell_bins() { echo "$HOME/Library/Haskell/bin" }
 function gem_bins()     { echo "$GEM_HOME/bin" }
-function 8br_bins()     { echo "$HOME/work/enova/8b/bin" }
-function nim_bins()     { echo "$HOME/work/nimrod/bin" }
-function go_bins()      { echo "$GOPATH/bin" }
+# function go_bins()      { echo "$GOPATH/bin" }
 
-export GOPATH=$HOME/go
-export PATH=$(8br_bins):$(haskell_bins):$(nim_bins):$(go_bins):$(gem_bins):$(global_bins)
+# export GOPATH=$HOME/go
+export PATH=$(gem_bins):$(global_bins)
 chpwd
