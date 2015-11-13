@@ -3,13 +3,14 @@ alias l='ls -lhpG'
 alias lsa='ls -lhpA'
 
 alias e='emacs'
+alias erc='emacs -e "run-erc"'
 
 alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 alias grip='grep -i --color=auto'
 
-alias t='tree -C --dirsfirst -I coverage '
+alias t='tree -C --dirsfirst -I "coverage|build|dist" '
 alias t2='t -L 2'
 
 # make aliases work with "sudo"

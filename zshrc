@@ -169,25 +169,56 @@ function bere() {
 
 # add WTFPL license
 function wtfpl() {
-    if [ -f LICENSE ]; then
-        echo 'LICENSE file already exists'
+    if [ -f COPYING ]; then
+        echo 'COPYING file already exists'
     else
-        cat > LICENSE <<- EOM
-        DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE 
-                    Version 2, December 2004 
+        cat > COPYING <<- EOM
+        DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+                    Version 2, December 2004
 
- Copyright (C) 2004 Sam Hocevar <sam@hocevar.net> 
+ Copyright (C) 2015 Ben Trevor <benjamin.trevor@gmail.com>
 
- Everyone is permitted to copy and distribute verbatim or modified 
- copies of this license document, and changing it is allowed as long 
- as the name is changed. 
+ Everyone is permitted to copy and distribute verbatim or modified
+ copies of this license document, and changing it is allowed as long
+ as the name is changed.
 
-            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE 
-   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION 
+            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
 
   0. You just DO WHAT THE FUCK YOU WANT TO.
 EOM
-    fi  
+    fi
+}
+
+function hoog() {
+  hoogle $@ | head -5
+}
+
+function colortest() {
+    for x in 0 1 4 5 7 8; do
+        for i in `seq 30 37`; do
+            for a in `seq 40 47`; do
+                echo -ne "\e[$x;$i;$a""m\\\e[$x;$i;$a""m\e[0;37;40m ";
+            done;
+            echo;
+        done;
+    done;
+
+    echo "";
+}
+
+function rename_box() {
+    OLD_BOX_NAME=$1
+    PROVIDER=$2
+    NEW_BOX_NAME=$3
+
+    echo "repackaging $OLD_BOX_NAME..."
+    vagrant box repackage $OLD_BOX_NAME $PROVIDER
+    echo "adding $NEW_BOX_NAME..."
+    vagrant box add $NEW_BOX_NAME package.box
+    rm package.box
+    vagrant box remove $OLD_BOX_NAME
+    echo 'Success!'
 }
 
 # for debugging
@@ -196,8 +227,9 @@ cat ~/.zshrc > ~/.loaded_zshrc
 ### set up session ###
 function global_bins()  { echo '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin' }
 function gem_bins()     { echo "$GEM_HOME/bin" }
+function cabal_bins()     { echo "$HOME/.cabal/bin" }
 # function go_bins()      { echo "$GOPATH/bin" }
 
 # export GOPATH=$HOME/go
-export PATH=$(gem_bins):$(global_bins)
+export PATH=$(gem_bins):$(global_bins):$(cabal_bins)
 chpwd
