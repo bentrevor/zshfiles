@@ -4,6 +4,7 @@ alias lsa='ls -lhpA'
 
 alias e='emacs'
 alias erc='emacs -e "run-erc"'
+alias notes='emacs -e "just-text"'
 
 alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'

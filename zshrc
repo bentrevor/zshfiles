@@ -228,8 +228,8 @@ cat ~/.zshrc > ~/.loaded_zshrc
 function global_bins()  { echo '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin' }
 function gem_bins()     { echo "$GEM_HOME/bin" }
 function cabal_bins()     { echo "$HOME/.cabal/bin" }
-# function go_bins()      { echo "$GOPATH/bin" }
+function go_bins()      { echo "$GOPATH/bin" }
 
-# export GOPATH=$HOME/go
-export PATH=$(gem_bins):$(global_bins):$(cabal_bins)
+export GOPATH=$HOME/go
+export PATH=$(gem_bins):$(global_bins):$(cabal_bins):$(go_bins)
 chpwd
